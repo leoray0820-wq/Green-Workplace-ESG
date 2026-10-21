@@ -51,7 +51,7 @@
             <!-- 註冊表單 -->
             <form id="register-form" onsubmit="handleRegister(event)" class="space-y-3 hidden">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">企業/單位名稱</label>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">單位名稱</label>
                     <input type="text" id="reg-company-name" required placeholder="例如：綠色科技股份有限公司" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50">
                 </div>
                 <div>
@@ -84,7 +84,7 @@
                             <span id="header-company-name">永續行動影響力</span>
                             <span id="role-badge" class="text-xs bg-emerald-400 text-slate-900 font-extrabold px-2.5 py-0.5 rounded-full">驗證成功</span>
                         </h1>
-                        <p class="text-xs text-slate-400">GRI 306 & TNFD 雲端數據與影響力跨裝置同步系統</p>
+                        <p class="text-xs text-slate-400">GRI 306 & TNFD 雲端數據管理系統</p>
                     </div>
                 </div>
                 
@@ -486,7 +486,7 @@
                 document.getElementById('role-badge').className = 'text-xs bg-amber-400 text-slate-900 font-extrabold px-2.5 py-0.5 rounded-full';
                 document.getElementById('admin-control-panel').classList.remove('hidden');
             } else {
-                document.getElementById('role-badge').innerText = '一般用戶';
+                document.getElementById('role-badge').innerText = '';
                 document.getElementById('role-badge').className = 'text-xs bg-emerald-400 text-slate-900 font-bold px-2.5 py-0.5 rounded-full';
                 document.getElementById('admin-control-panel').classList.add('hidden');
             }
@@ -528,9 +528,9 @@
         function updateAdminCompanySelect() {
             const select = document.getElementById('admin-company-select');
             if (!select) return;
-            let html = `<option value="ALL">🌐 全場域所有企業彙總 (Total Overview)</option>`;
+            let html = `<option value="ALL">🌐 所有單位彙總 (Total Overview)</option>`;
             registeredCompanies.forEach(comp => {
-                html += `<option value="${comp.companyId}">🏢 僅看 ${comp.companyName}</option>`;
+                html += `<option value="${comp.companyId}">🏢  ${comp.companyName}</option>`;
             });
             select.innerHTML = html;
         }
