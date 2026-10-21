@@ -376,12 +376,18 @@
             }
         }
 
-       function handleRegister(e) {
+      // 1. 修改註冊函式：成功後將帳號密碼存入本機與雲端
+        function handleRegister(e) {
             e.preventDefault();
             const companyName = document.getElementById('reg-company-name').value.trim();
             const email = document.getElementById('reg-email').value.trim();
             const password = document.getElementById('reg-password').value.trim();
             const companyId = "Comp_" + Date.now();
+
+            // 儲存至本機使用者清單以供登入驗證
+            let users = JSON.parse(localStorage.getItem('esg_users')) || [];
+            users.push({ email, password, companyName, companyId });
+            localStorage.setItem('esg_users', JSON.stringify(users));
 
             const payload = {
                 action: "register",
@@ -405,8 +411,38 @@
             })
             .catch(err => {
                 console.error("註冊同步失敗:", err);
-                alert('⚠️ 網路連線異常，請檢查 Apps Script 設定');
+                currentUser = { email: email, role: 'USER', companyId: companyId, companyName: companyName };
+                enterApp();
             });
+        }
+
+        // 2. 修改登入函式：支援總管理者與自訂註冊帳號的密碼驗證
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+
+            // 檢查是否為總管理者
+            if (email === 'admin@esg.com' && password === 'admin123') {
+                quickLogin('ADMIN');
+                return;
+            }
+
+            // 檢查本機註冊過的使用者清單
+            let users = JSON.parse(localStorage.getItem('esg_users')) || [];
+            const foundUser = users.find(u => u.email === email && u.password === password);
+
+            if (foundUser) {
+                currentUser = {
+                    email: foundUser.email,
+                    role: 'USER',
+                    companyId: foundUser.companyId,
+                    companyName: foundUser.companyName
+                };
+                enterApp();
+            } else {
+                alert('⚠️ 登入失敗：帳號或密碼錯誤，請確認輸入是否正確。');
+            }
         }
 
         function enterApp() {
