@@ -1,12 +1,9 @@
- <!-- =================================================================== -->
-    <!-- ESG永續雲端管理系統 -->
-    <!-- =================================================================== -->
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESG 永續行動影響力 | 多租戶雲端管理平台</title>
+    <title>ESG 永續行動影響力 | 雲端管理平台</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js CDN -->
@@ -26,7 +23,7 @@
                 <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-2 text-2xl font-bold">
                     🛡️
                 </div>
-                <h2 class="text-2xl font-bold text-slate-800">ESG 永續雲端管理系統</h2>
+                <h2 class="text-2xl font-bold text-slate-800">ESG 永續行動影響力 | 雲端管理系統</h2>
                 <p class="text-xs text-slate-400">GRI 306 & TNFD 合規數據跨裝置同步平台</p>
             </div>
 
@@ -84,10 +81,10 @@
                     <div class="p-2.5 bg-emerald-500 rounded-xl text-slate-900 text-xl font-bold">🏢</div>
                     <div>
                         <h1 class="text-xl font-bold tracking-wide flex items-center gap-2">
-                            <span id="header-company-name">企業內部儀表板</span>
+                            <span id="header-company-name">企業永續行動影響力</span>
                             <span id="role-badge" class="text-xs bg-emerald-400 text-slate-900 font-extrabold px-2.5 py-0.5 rounded-full">驗證成功</span>
                         </h1>
-                        <p class="text-xs text-slate-400">GRI 306 & TNFD 雲端隔離與影響力跨裝置同步系統</p>
+                        <p class="text-xs text-slate-400">GRI 306 & TNFD 雲端數據與影響力跨裝置同步系統</p>
                     </div>
                 </div>
                 
@@ -119,14 +116,14 @@
                 <div class="flex items-center space-x-3">
                     <span class="text-2xl">👑</span>
                     <div>
-                        <h3 class="text-sm font-bold text-amber-900">總管理者最高監控面板 (Super Admin Overview)</h3>
-                        <p class="text-xs text-amber-700">您可以切換單一加盟企業檢視隔離數據，或觀看全場域彙總總覽</p>
+                        <h3 class="text-sm font-bold text-amber-900">總管理者監控面板 (Super Admin Overview)</h3>
+                        <p class="text-xs text-amber-700">您可以切換企業檢視影響力，或觀看所有企業彙總總覽</p>
                     </div>
                 </div>
                 <div>
                     <!-- 動態生成的企業下拉選單 -->
                     <select id="admin-company-select" onchange="filterData()" class="border border-amber-400 rounded-xl px-3 py-2 text-xs font-bold text-amber-900 focus:ring-2 focus:ring-amber-500 outline-none bg-white">
-                        <option value="ALL">🌐 全場域所有企業彙總 (Total Overview)</option>
+                        <option value="ALL">🌐 所有企業彙總 (Total Overview)</option>
                     </select>
                 </div>
             </div>
@@ -150,7 +147,7 @@
                     </div>
                     <div class="bg-white/80 p-3 rounded-xl border border-emerald-100">
                         <p class="font-bold text-slate-700 mb-0.5">3. 個人與團隊行動影響力</p>
-                        <p class="text-[11px] text-slate-500">追蹤「誰的行動」、參與總人次與累計頻次，量化組織成員之永續足跡。</p>
+                        <p class="text-[11px] text-slate-500">追蹤「永續行動」、參與總人次與累計頻次，量化組織成員之永續足跡。</p>
                     </div>
                 </div>
             </div>
@@ -177,7 +174,7 @@
 
                 <!-- 參與總人次 -->
                 <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
-                    <p class="text-xs font-semibold text-slate-400 uppercase">參與總人次 (誰的行動)</p>
+                    <p class="text-xs font-semibold text-slate-400 uppercase">參與總人次 (永續行動)</p>
                     <p class="text-2xl font-bold text-slate-800 my-1" id="kpi-total-people">0 <span class="text-xs font-normal text-slate-500">人</span></p>
                     <p class="text-[10px] text-indigo-600">個人與影響力追蹤</p>
                 </div>
@@ -222,7 +219,7 @@
                 <div class="p-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4">
                     <div>
                         <h2 class="text-base font-bold text-slate-800">歷史稽核與行動數據清單</h2>
-                        <p class="text-xs text-slate-400">紀錄數據已進行多租戶隔離保護，僅展示授權權限內之資料</p>
+                        <p class="text-xs text-slate-400">各帳號可針對自己上傳的資料進行編輯修改或刪除</p>
                     </div>
                     <div class="flex items-center space-x-3">
                         <input type="text" id="table-search" oninput="filterData()" placeholder="搜尋填寫人、部門或主題..." class="border border-slate-200 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
@@ -246,6 +243,7 @@
                                 <th class="p-3.5">記錄單位</th>
                                 <th class="p-3.5">填寫人</th>
                                 <th class="p-3.5">現場備註</th>
+                                <th class="p-3.5 text-center">操作</th>
                             </tr>
                         </thead>
                         <tbody id="data-table-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
@@ -255,7 +253,7 @@
         </main>
     </div>
 
-    <!-- Modal Form (雙軌填報視窗) -->
+    <!-- Modal Form (雙軌填報與編輯視窗) -->
     <div id="modal" class="fixed inset-0 bg-black/60 modal-blur z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
             <div class="bg-slate-900 text-white p-5 px-6 flex justify-between items-center">
@@ -266,6 +264,7 @@
             </div>
 
             <form id="record-form" onsubmit="handleModalSubmit(event)" class="p-6 space-y-4 overflow-y-auto flex-1 text-xs">
+                <input type="hidden" id="form-id" value="">
                 <input type="hidden" id="form-type" value="waste">
 
                 <div>
@@ -309,10 +308,10 @@
                 <!-- 現場照片欄位 -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1 flex items-center justify-between">
-                        <span>現場照片存證 (自動上傳雲端硬碟)</span>
-                        <span class="text-rose-500 font-bold">* 必填照片憑證</span>
+                        <span>現場照片憑證 (自動上傳雲端硬碟)</span>
+                        <span class="text-slate-400 font-normal">(編輯時若不選則保留原照片)</span>
                     </label>
-                    <input type="file" id="form-photo" accept="image/*" required onchange="compressImage(event)" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+                    <input type="file" id="form-photo" accept="image/*" onchange="compressImage(event)" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
                     <div id="photo-preview-container" class="mt-3 hidden relative w-32 h-32 rounded-lg border border-slate-200 overflow-hidden">
                         <img id="photo-preview" src="" class="w-full h-full object-cover">
                     </div>
@@ -336,7 +335,7 @@
 
                 <div class="pt-2 flex justify-end space-x-3">
                     <button type="button" onclick="closeModal()" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50">取消</button>
-                    <button type="submit" id="submit-btn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-sm">確認填報並同步雲端</button>
+                    <button type="submit" id="submit-btn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-sm">確認並同步雲端</button>
                 </div>
             </form>
         </div>
@@ -344,10 +343,10 @@
 
     <!-- Application JavaScript Logic -->
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwZ92i11AqPYhu0QvSF3cL9mzedrl5YEyZKugRTA36jLSsfB1iegipW7no-JcTpGFWADw/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwiMuUVZWAVBTgKWoBrGv_KOFETtNEO2E0MqCScQtZ7l4foWtqlPEzbE5nqUQSmx1JqRA/exec";
 
         let database = [];
-        let registeredCompanies = []; // 儲存從雲端讀取到的已註冊企業名單
+        let registeredCompanies = [];
         let currentUser = null;
         let compressedPhotoBase64 = '';
         let cWasteTrend = null, cWasteCat = null, cBioTrend = null, cBioCat = null;
@@ -499,7 +498,6 @@
             document.getElementById('auth-screen').classList.remove('hidden');
         }
 
-        // ☁️ 雲端 GET 讀取：同時載入 ESG 紀錄與已註冊企業清單
         function loadCloudData() {
             const syncIcon = document.getElementById('sync-icon');
             if (syncIcon) syncIcon.classList.add('animate-spin');
@@ -513,7 +511,7 @@
                     if (data && Array.isArray(data.companies)) {
                         registeredCompanies = data.companies;
                     }
-                    updateAdminCompanySelect(); // 更新管理者下拉選單
+                    updateAdminCompanySelect();
                     filterData();
                 })
                 .catch(err => {
@@ -525,25 +523,75 @@
                 });
         }
 
-        // 動態更新管理者的企業下拉選單
         function updateAdminCompanySelect() {
             const select = document.getElementById('admin-company-select');
             if (!select) return;
-            
-            // 保留原本的「全場域總彙總」選項
             let html = `<option value="ALL">🌐 全場域所有企業彙總 (Total Overview)</option>`;
-            
-            // 將雲端讀取到的已註冊企業動態加入下拉選單
             registeredCompanies.forEach(comp => {
                 html += `<option value="${comp.companyId}">🏢 僅看 ${comp.companyName}</option>`;
             });
-            
             select.innerHTML = html;
         }
 
+        // 開啟彈窗（支援新增與編輯）
+        function openModal(type, editId = null) {
+            document.getElementById('form-id').value = '';
+            document.getElementById('record-form').reset();
+            document.getElementById('form-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('photo-preview-container').classList.add('hidden');
+            compressedPhotoBase64 = '';
+
+            if (editId) {
+                // 編輯模式：帶入原資料
+                const item = database.find(i => String(i.id) === String(editId));
+                if (!item) return;
+
+                document.getElementById('modal-title').innerHTML = `<span>✏️</span> 編輯雲端數據`;
+                document.getElementById('form-id').value = item.id;
+                document.getElementById('form-type').value = item.type;
+                document.getElementById('form-date').value = item.date;
+                document.getElementById('form-dept').value = item.dept;
+                document.getElementById('form-author').value = item.author;
+                document.getElementById('form-notes').value = item.notes;
+
+                if (item.type === 'waste') {
+                    document.getElementById('field-category-waste').classList.remove('hidden');
+                    document.getElementById('field-amount-waste').classList.remove('hidden');
+                    document.getElementById('field-bio-details').classList.add('hidden');
+                    document.getElementById('form-category-waste').value = item.category;
+                    document.getElementById('form-amount').value = item.amount;
+                } else {
+                    document.getElementById('field-category-waste').classList.add('hidden');
+                    document.getElementById('field-amount-waste').classList.add('hidden');
+                    document.getElementById('field-bio-details').classList.remove('hidden');
+                    document.getElementById('form-bio-title').value = item.category;
+                    document.getElementById('form-worm-rating').value = item.rating;
+                }
+            } else {
+                // 新增模式
+                document.getElementById('modal-title').innerHTML = `<span>☁️</span> 填報雲端數據`;
+                document.getElementById('form-type').value = type;
+                if (type === 'waste') {
+                    document.getElementById('field-category-waste').classList.remove('hidden');
+                    document.getElementById('field-amount-waste').classList.remove('hidden');
+                    document.getElementById('field-bio-details').classList.add('hidden');
+                } else {
+                    document.getElementById('field-category-waste').classList.add('hidden');
+                    document.getElementById('field-amount-waste').classList.add('hidden');
+                    document.getElementById('field-bio-details').classList.remove('hidden');
+                }
+            }
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+
+        // 提交表單（自動判斷是「新增」還是「編輯更新」）
         function handleModalSubmit(e) {
             e.preventDefault();
-
+            const editId = document.getElementById('form-id').value;
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.disabled = true;
             submitBtn.innerHTML = `⏳ 正在同步至雲端...`;
@@ -552,11 +600,12 @@
             const isWaste = type === 'waste';
             const amount = parseFloat(document.getElementById('form-amount').value) || 0;
 
-            const targetCompanyId = currentUser.role === 'ADMIN' ? 'ALL' : currentUser.companyId;
+            const targetCompanyId = currentUser.role === 'ADMIN' ? 'CompanyA' : currentUser.companyId;
             const targetCompanyName = currentUser.role === 'ADMIN' ? '總管理處' : currentUser.companyName;
 
             const payload = {
-                id: Date.now(),
+                action: editId ? "update" : "insert",
+                id: editId ? editId : Date.now(),
                 companyId: targetCompanyId,
                 companyName: targetCompanyName,
                 date: document.getElementById('form-date').value,
@@ -578,18 +627,42 @@
                 body: JSON.stringify(payload)
             })
             .then(() => {
-                alert('🎉 資料與照片憑證已成功同步至 Google 雲端！');
+                alert(editId ? '🎉 編輯資料已成功更新至雲端！' : '🎉 資料已成功同步至 Google 雲端！');
                 closeModal();
                 setTimeout(loadCloudData, 1500);
             })
             .catch(err => {
                 console.error("雲端同步異常:", err);
                 alert('⚠️ 網路連線異常，請檢查網路。');
-                closeModal();
             })
             .finally(() => {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = `確認填報並同步雲端`;
+                submitBtn.innerHTML = `確認並同步雲端`;
+            });
+        }
+
+        // 刪除資料函式
+        function deleteRecord(id) {
+            if (!confirm("確定要刪除這筆永續紀錄嗎？")) return;
+
+            const payload = {
+                action: "delete",
+                id: id
+            };
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                alert("🗑️ 資料已成功刪除！");
+                setTimeout(loadCloudData, 1200);
+            })
+            .catch(err => {
+                console.error("刪除失敗:", err);
+                alert("⚠️ 刪除失敗，請檢查網路連線。");
             });
         }
 
@@ -714,6 +787,18 @@
                 tr.className = "hover:bg-slate-50 transition";
                 const isWaste = item.type === 'waste';
                 const photoHtml = item.photo ? `<a href="${item.photo}" target="_blank" class="text-indigo-600 underline font-bold">🖼️ 檢視照片</a>` : `<span class="text-slate-300">無照片</span>`;
+                
+                // 檢查是否為該公司資料或管理者，允許編輯與刪除
+                let actionHtml = `<span class="text-slate-300 text-[11px]">唯讀</span>`;
+                if (currentUser && (currentUser.role === 'ADMIN' || currentUser.companyId === item.companyId)) {
+                    actionHtml = `
+                        <div class="flex items-center justify-center space-x-2">
+                            <button onclick="openModal('${item.type}', '${item.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1 rounded-lg text-[11px] font-bold transition">編輯</button>
+                            <button onclick="deleteRecord('${item.id}')" class="bg-rose-500 hover:bg-rose-600 text-white px-2.5 py-1 rounded-lg text-[11px] font-bold transition">刪除</button>
+                        </div>
+                    `;
+                }
+
                 tr.innerHTML = `
                     <td class="p-3.5 font-bold text-slate-800">${item.companyName || '-'}</td>
                     <td class="p-3.5">${photoHtml}</td>
@@ -725,27 +810,10 @@
                     <td class="p-3.5 text-slate-500">${item.dept || '-'}</td>
                     <td class="p-3.5 font-bold text-indigo-900 bg-indigo-50/50 rounded-lg">${item.author || '-'}</td>
                     <td class="p-3.5 text-slate-400 max-w-xs truncate">${item.notes || '-'}</td>
+                    <td class="p-3.5 text-center">${actionHtml}</td>
                 `;
                 tbody.appendChild(tr);
             });
-        }
-
-        function openModal(type) {
-            document.getElementById('form-type').value = type;
-            document.getElementById('modal').classList.remove('hidden');
-            if (type === 'waste') {
-                document.getElementById('field-category-waste').classList.remove('hidden');
-                document.getElementById('field-amount-waste').classList.remove('hidden');
-                document.getElementById('field-bio-details').classList.add('hidden');
-            } else {
-                document.getElementById('field-category-waste').classList.add('hidden');
-                document.getElementById('field-amount-waste').classList.add('hidden');
-                document.getElementById('field-bio-details').classList.remove('hidden');
-            }
-        }
-
-        function closeModal() {
-            document.getElementById('modal').classList.add('hidden');
         }
 
         function exportCSV() {
