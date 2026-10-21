@@ -317,8 +317,12 @@
                     <div id="photo-preview-container" class="mt-3 hidden relative w-32 h-32 rounded-lg border border-slate-200 overflow-hidden">
                         <img id="photo-preview" src="" class="w-full h-full object-cover">
                     </div>
+                        
+                    <!-- 🤖 AI 比對結果顯示框 -->
+                    <div id="ai-verify-badge" class="hidden"></div>
                 </div>
-
+                    
+               
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block font-semibold text-slate-600 uppercase mb-1">記錄單位</label>
@@ -345,7 +349,7 @@
 
     <!-- Application JavaScript Logic -->
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyzZ7q78FFUY-O1qAjDKcELHpYdglWNI-M0RjFoBqT63A8-VIkrwcJYX6NfMf9tj2_6rQ/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbnNEhLbar13PY3HMkeYwlLEhoBIYQsgDCehFF2wALg4DP41cnAVZt4k_3d-uuHdm5nQ/exec";
 
         let database = [];
         let registeredCompanies = [];
@@ -668,35 +672,90 @@
             });
         }
 
-        function compressImage(event) {
-            const file = event.target.files[0];
-            if (!file) {
-                compressedPhotoBase64 = '';
-                document.getElementById('photo-preview-container').classList.add('hidden');
-                return;
+        // 在 compressImage 壓縮完圖片後，自動發送給 AI 辨識
+function compressImage(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        compressedPhotoBase64 = '';
+        document.getElementById('photo-preview-container').classList.add('hidden');
+        document.getElementById('ai-verify-badge').classList.add('hidden');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const MAX = 800;
+            let w = img.width, h = img.height;
+            if (w > h) { if (w > MAX) { h *= MAX / w; w = MAX; } }
+            else { if (h > MAX) { w *= MAX / h; h = MAX; } }
+
+            canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            compressedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.6);
+            document.getElementById('photo-preview').src = compressedPhotoBase64;
+            document.getElementById('photo-preview-container').classList.remove('hidden');
+
+            // 🤖 上傳同時，自動進行 AI 照片驗證
+            runAiPhotoVerification();
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+// 🤖 發送 AI 照片比對請求
+function runAiPhotoVerification() {
+    if (!compressedPhotoBase64) return;
+
+    const type = document.getElementById('form-type').value;
+    const isWaste = type === 'waste';
+    const category = isWaste 
+        ? document.getElementById('form-category-waste').value 
+        : (document.getElementById('form-bio-title').value || '生態觀察');
+
+    const badge = document.getElementById('ai-verify-badge');
+    if (!badge) return;
+
+    badge.classList.remove('hidden');
+    badge.className = "mt-2 p-2.5 text-xs rounded-xl bg-amber-50 border border-amber-200 text-amber-800 flex items-center gap-2";
+    badge.innerHTML = `<span>⏳</span> AI 正在分析照片與「${category}」是否相符...`;
+
+    const payload = {
+        action: "analyze_image",
+        photoBase64: compressedPhotoBase64,
+        expectedCategory: category,
+        type: type
+    };
+
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res.status === "success") {
+            if (res.matched) {
+                badge.className = "mt-2 p-2.5 text-xs rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center gap-2";
+                badge.innerHTML = `<span>✅</span> <b>AI 辨識相符：</b>${res.detectedContent}（${res.reason}）`;
+            } else {
+                badge.className = "mt-2 p-2.5 text-xs rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-2";
+                badge.innerHTML = `<span>⚠️</span> <b>AI 警告：</b>畫面可能是「${res.detectedContent}」，與選擇的「${category}」可能不符合。`;
             }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const MAX = 800;
-                    let w = img.width, h = img.height;
-                    if (w > h) { if (w > MAX) { h *= MAX / w; w = MAX; } }
-                    else { if (h > MAX) { w *= MAX / h; h = MAX; } }
-
-                    canvas.width = w; canvas.height = h;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, w, h);
-                    compressedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.6);
-                    document.getElementById('photo-preview').src = compressedPhotoBase64;
-                    document.getElementById('photo-preview-container').classList.remove('hidden');
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+        } else {
+            badge.className = "mt-2 p-2.5 text-xs rounded-xl bg-slate-50 text-slate-500";
+            badge.innerHTML = `ℹ️ AI 比對略過。`;
         }
+    })
+    .catch(err => {
+        console.error("AI 比對連線失敗:", err);
+        badge.classList.add('hidden');
+    });
+}
 
         function getAccessibleRecords() {
             if (!currentUser) return [];
