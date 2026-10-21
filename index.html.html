@@ -121,10 +121,9 @@
                     </div>
                 </div>
                 <div>
+                    <!-- 動態生成的企業下拉選單 -->
                     <select id="admin-company-select" onchange="filterData()" class="border border-amber-400 rounded-xl px-3 py-2 text-xs font-bold text-amber-900 focus:ring-2 focus:ring-amber-500 outline-none bg-white">
                         <option value="ALL">🌐 全場域所有企業彙總 (Total Overview)</option>
-                        <option value="CompanyA">🏢 僅看 Company A (綠色科技)</option>
-                        <option value="CompanyB">🏢 僅看 Company B (生態企業)</option>
                     </select>
                 </div>
             </div>
@@ -242,7 +241,7 @@
                                 <th class="p-3.5">數量 / 評分</th>
                                 <th class="p-3.5">估算減碳量</th>
                                 <th class="p-3.5">記錄單位</th>
-                                <th class="p-3.5">填寫人 (誰的行動)</th>
+                                <th class="p-3.5">填寫人</th>
                                 <th class="p-3.5">現場備註</th>
                             </tr>
                         </thead>
@@ -342,10 +341,10 @@
 
     <!-- Application JavaScript Logic -->
     <script>
-        // Google Apps Script Web App 部署網址
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_vzuouJ9pyMql_l3CRxZa2ty-qTCzQZRhd86Bg4uLxjCSAIz0vJSGXGTpzqgadNM_7Q/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwZ92i11AqPYhu0QvSF3cL9mzedrl5YEyZKugRTA36jLSsfB1iegipW7no-JcTpGFWADw/exec";
 
         let database = [];
+        let registeredCompanies = []; // 儲存從雲端讀取到的已註冊企業名單
         let currentUser = null;
         let compressedPhotoBase64 = '';
         let cWasteTrend = null, cWasteCat = null, cBioTrend = null, cBioCat = null;
@@ -373,7 +372,6 @@
             }
         }
 
-        // 1. 雲端註冊邏輯：會向 Google 試算表查詢，重複時跳回登入畫面
         function handleRegister(e) {
             e.preventDefault();
             const btn = document.getElementById('reg-submit-btn');
@@ -402,7 +400,7 @@
             .then(res => {
                 if (res.status === "duplicate") {
                     alert("⚠️ " + res.message);
-                    switchAuthTab('login'); // 自動跳回登入畫面
+                    switchAuthTab('login');
                 } else if (res.status === "success") {
                     alert(`🎉 帳號申請成功！\n企業：${companyName}\n帳號：${email}`);
                     currentUser = { email: email, role: 'USER', companyId: companyId, companyName: companyName };
@@ -421,14 +419,14 @@
             });
         }
 
-        // 2. 雲端登入邏輯：直接向 Google 試算表驗證帳密
         function handleLogin(e) {
             e.preventDefault();
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value.trim();
 
             if (email === 'admin@esg.com' && password === 'admin123') {
-                quickLogin('ADMIN');
+                currentUser = { email: 'admin@esg.com', role: 'ADMIN', companyId: 'ALL', companyName: '全場域總管理中心' };
+                enterApp();
                 return;
             }
 
@@ -471,17 +469,6 @@
             });
         }
 
-        function quickLogin(roleType) {
-            if (roleType === 'ADMIN') {
-                currentUser = { email: 'admin@esg.com', role: 'ADMIN', companyId: 'ALL', companyName: '全場域總管理中心' };
-            } else if (roleType === 'CompanyA') {
-                currentUser = { email: 'userA@companyA.com', role: 'USER', companyId: 'CompanyA', companyName: 'Company A 綠色科技' };
-            } else if (roleType === 'CompanyB') {
-                currentUser = { email: 'userB@companyB.com', role: 'USER', companyId: 'CompanyB', companyName: 'Company B 生態企業' };
-            }
-            enterApp();
-        }
-
         function enterApp() {
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('app-screen').classList.remove('hidden');
@@ -509,7 +496,7 @@
             document.getElementById('auth-screen').classList.remove('hidden');
         }
 
-        // ☁️ 雲端 GET 讀取：跨裝置自動同步所有資料
+        // ☁️ 雲端 GET 讀取：同時載入 ESG 紀錄與已註冊企業清單
         function loadCloudData() {
             const syncIcon = document.getElementById('sync-icon');
             if (syncIcon) syncIcon.classList.add('animate-spin');
@@ -517,9 +504,13 @@
             fetch(GOOGLE_SCRIPT_URL)
                 .then(res => res.json())
                 .then(data => {
-                    if (Array.isArray(data)) {
-                        database = data;
+                    if (data && Array.isArray(data.records)) {
+                        database = data.records;
                     }
+                    if (data && Array.isArray(data.companies)) {
+                        registeredCompanies = data.companies;
+                    }
+                    updateAdminCompanySelect(); // 更新管理者下拉選單
                     filterData();
                 })
                 .catch(err => {
@@ -531,7 +522,22 @@
                 });
         }
 
-        // ☁️ 雲端 POST 寫入
+        // 動態更新管理者的企業下拉選單
+        function updateAdminCompanySelect() {
+            const select = document.getElementById('admin-company-select');
+            if (!select) return;
+            
+            // 保留原本的「全場域總彙總」選項
+            let html = `<option value="ALL">🌐 全場域所有企業彙總 (Total Overview)</option>`;
+            
+            // 將雲端讀取到的已註冊企業動態加入下拉選單
+            registeredCompanies.forEach(comp => {
+                html += `<option value="${comp.companyId}">🏢 僅看 ${comp.companyName}</option>`;
+            });
+            
+            select.innerHTML = html;
+        }
+
         function handleModalSubmit(e) {
             e.preventDefault();
 
@@ -543,8 +549,8 @@
             const isWaste = type === 'waste';
             const amount = parseFloat(document.getElementById('form-amount').value) || 0;
 
-            const targetCompanyId = currentUser.role === 'ADMIN' ? 'CompanyA' : currentUser.companyId;
-            const targetCompanyName = currentUser.role === 'ADMIN' ? 'Company A 綠色科技' : currentUser.companyName;
+            const targetCompanyId = currentUser.role === 'ADMIN' ? 'ALL' : currentUser.companyId;
+            const targetCompanyName = currentUser.role === 'ADMIN' ? '總管理處' : currentUser.companyName;
 
             const payload = {
                 id: Date.now(),
@@ -571,7 +577,7 @@
             .then(() => {
                 alert('🎉 資料與照片憑證已成功同步至 Google 雲端！');
                 closeModal();
-                setTimeout(loadCloudData, 1500); // 重新從雲端抓取最新整合資料
+                setTimeout(loadCloudData, 1500);
             })
             .catch(err => {
                 console.error("雲端同步異常:", err);
