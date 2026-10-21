@@ -17,8 +17,8 @@
     <!-- =================================================================== -->
     <!-- 1. 登入/註冊 介面 (Auth View) -->
     <!-- =================================================================== -->
-    <div id="auth-screen" class="fixed inset-0 z-50 bg-slate-900 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 space-y-6 border border-slate-200">
+    <div id="auth-screen" class="fixed inset-0 z-50 bg-slate-900 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 space-y-6 border border-slate-200 my-auto">
             <div class="text-center space-y-2">
                 <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-2 text-2xl font-bold">
                     🛡️
@@ -37,11 +37,11 @@
             <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">企業帳號 (Email)</label>
-                    <input type="email" id="login-email" value="" required placeholder="輸入 Email" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50">
+                    <input type="email" id="login-email" value="admin@esg.com" required placeholder="輸入 Email" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">密碼</label>
-                    <input type="password" id="login-password" value="" required placeholder="••••••••" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50">
+                    <input type="password" id="login-password" value="admin123" required placeholder="••••••••" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50">
                 </div>
                 <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg transition duration-200">
                     🔑 驗證登入
@@ -66,11 +66,32 @@
                     📝 送出帳號申請
                 </button>
                 
-                <!-- 👇 新增：返回登入頁面按鈕 -->
+                <!-- 返回登入頁面按鈕 -->
                 <button type="button" onclick="switchAuthTab('login')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl transition text-xs">
                     ↩️ 已經有帳號？返回登入頁面
                 </button>
             </form>
+
+            <div class="relative flex py-1 items-center">
+                <div class="flex-grow border-t border-slate-200"></div>
+                <span class="flex-shrink mx-4 text-[11px] text-slate-400">快速測試帳號</span>
+                <div class="flex-grow border-t border-slate-200"></div>
+            </div>
+
+            <!-- 免打字快速體驗按鈕 -->
+            <div class="space-y-1.5">
+                <button type="button" onclick="quickLogin('ADMIN')" class="w-full bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold py-2 rounded-xl transition">
+                    👑 以【總管理者】登入 (全場域視角)
+                </button>
+                <button type="button" onclick="quickLogin('CompanyA')" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold py-2 rounded-xl transition">
+                    🏢 以【Company A 綠色科技】登入
+                </button>
+                <button type="button" onclick="quickLogin('CompanyB')" class="w-full bg-slate-600 hover:bg-slate-700 text-white text-xs font-bold py-2 rounded-xl transition">
+                    🏢 以【Company B 生態企業】登入
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- =================================================================== -->
     <!-- 2. 主儀表板介面 (Dashboard View) -->
@@ -176,14 +197,14 @@
                     <p class="text-[10px] text-amber-600">SOC 土壤碳匯效益</p>
                 </div>
 
-                <!-- 新增：參與總人次 -->
+                <!-- 參與總人次 -->
                 <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
                     <p class="text-xs font-semibold text-slate-400 uppercase">參與總人次 (誰的行動)</p>
                     <p class="text-2xl font-bold text-slate-800 my-1" id="kpi-total-people">0 <span class="text-xs font-normal text-slate-500">人</span></p>
                     <p class="text-[10px] text-indigo-600">個人與影響力追蹤</p>
                 </div>
 
-                <!-- 新增：永續行動次數 -->
+                <!-- 永續行動次數 -->
                 <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
                     <p class="text-xs font-semibold text-slate-400 uppercase">累積行動總次數</p>
                     <p class="text-2xl font-bold text-slate-800 my-1" id="kpi-total-actions">0 <span class="text-xs font-normal text-slate-500">次行動</span></p>
@@ -307,14 +328,13 @@
                     </div>
                 </div>
 
-                <!-- 現場照片欄位 (強迫必填照片) -->
+                <!-- 現場照片存證 -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1 flex items-center justify-between">
-                        <span>現場照片存證 (自動上傳雲端硬碟)</span>
-                        <span class="text-rose-500 font-bold">* 必填照片憑證</span>
+                    <label class="block font-semibold text-slate-600 uppercase mb-1 flex justify-between">
+                        <span>現場照片憑證 (自動同步至 Google Drive)</span>
                     </label>
-                    <input type="file" id="form-photo" accept="image/*" required onchange="compressImage(event)" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-forest-50 file:text-forest-600 hover:file:bg-forest-100">
-                    <div id="photo-preview-container" class="mt-3 hidden relative w-32 h-32 rounded-lg border border-slate-200 overflow-hidden">
+                    <input type="file" id="form-photo" accept="image/*" onchange="compressImage(event)" class="w-full text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+                    <div id="photo-preview-container" class="mt-2 hidden relative w-24 h-24 rounded-xl border border-slate-200 overflow-hidden">
                         <img id="photo-preview" src="" class="w-full h-full object-cover">
                     </div>
                 </div>
@@ -348,6 +368,14 @@
         // Google Apps Script Web App 部署網址
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXCzsBwo4-8LJMc9m9csyJ5WaSUZOjgaWElNkNOgD-eQtLuIJOkA8WZR4wL-9Pezz-Rw/exec";
 
+        // 預設測試資料 (補齊 INITIAL_DATA 避免載入時報錯)
+        const INITIAL_DATA = [
+            { id: 101, companyId: "CompanyA", companyName: "Company A 綠色科技", date: "2026-10-15", type: "waste", category: "咖啡渣", amount: 25.5, carbon: 53.6, dept: "總務部", author: "陳大明", notes: "員工餐廳咖啡渣回收", photo: "" },
+            { id: 102, companyId: "CompanyA", companyName: "Company A 綠色科技", date: "2026-10-18", type: "bio", category: "蚯蚓活躍度", rating: 5, carbon: 0, dept: "永續小組", author: "林小華", notes: "1號箱分解快速", photo: "" },
+            { id: 201, companyId: "CompanyB", companyName: "Company B 生態企業", date: "2026-10-16", type: "waste", category: "生廚餘", amount: 42.0, carbon: 88.2, dept: "團膳部", author: "張阿姨", notes: "廚房葉菜類廚餘", photo: "" },
+            { id: 202, companyId: "CompanyB", companyName: "Company B 生態企業", date: "2026-10-19", type: "bio", category: "土壤蕈類", rating: 4, carbon: 0, dept: "廠務部", author: "李工程師", notes: "發現微生菌絲生長", photo: "" }
+        ];
+
         let database = JSON.parse(localStorage.getItem('esg_database')) || INITIAL_DATA;
         let currentUser = null;
         let compressedPhotoBase64 = '';
@@ -376,7 +404,7 @@
             }
         }
 
-      // 1. 修改註冊函式：成功後將帳號密碼存入本機與雲端
+        // 註冊邏輯
         function handleRegister(e) {
             e.preventDefault();
             const companyName = document.getElementById('reg-company-name').value.trim();
@@ -384,7 +412,6 @@
             const password = document.getElementById('reg-password').value.trim();
             const companyId = "Comp_" + Date.now();
 
-            // 儲存至本機使用者清單以供登入驗證
             let users = JSON.parse(localStorage.getItem('esg_users')) || [];
             users.push({ email, password, companyName, companyId });
             localStorage.setItem('esg_users', JSON.stringify(users));
@@ -397,7 +424,6 @@
                 companyId: companyId
             };
 
-            // 傳送到 Google 試算表的 Users 分頁
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -416,19 +442,17 @@
             });
         }
 
-        // 2. 修改登入函式：支援總管理者與自訂註冊帳號的密碼驗證
+        // 登入邏輯 (包含自訂註冊帳密與總管理者驗證)
         function handleLogin(e) {
             e.preventDefault();
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value.trim();
 
-            // 檢查是否為總管理者
             if (email === 'admin@esg.com' && password === 'admin123') {
                 quickLogin('ADMIN');
                 return;
             }
 
-            // 檢查本機註冊過的使用者清單
             let users = JSON.parse(localStorage.getItem('esg_users')) || [];
             const foundUser = users.find(u => u.email === email && u.password === password);
 
@@ -441,48 +465,11 @@
                 };
                 enterApp();
             } else {
-                alert('⚠️ 登入失敗：帳號或密碼錯誤，請確認輸入是否正確。');
+                alert('⚠️ 登入失敗：帳號或密碼錯誤。若為測試帳號請直接點擊下方「快速測試按鈕」。');
             }
         }
 
-        function enterApp() {
-            // 確保確實隱藏驗證/註冊畫面，並顯示主儀表板畫面
-            const authScreen = document.getElementById('auth-screen');
-            const appScreen = document.getElementById('app-screen');
-            
-            if (authScreen) authScreen.classList.add('hidden');
-            if (appScreen) appScreen.classList.remove('hidden');
-
-            document.getElementById('header-company-name').innerText = currentUser.companyName;
-            document.getElementById('user-display-email').innerText = currentUser.email;
-            document.getElementById('user-display-company').innerText = currentUser.companyName;
-
-            if (currentUser.role === 'ADMIN') {
-                document.getElementById('role-badge').innerText = '總管理者 (全場域視角)';
-                document.getElementById('role-badge').className = 'text-xs bg-amber-400 text-slate-900 font-extrabold px-2.5 py-0.5 rounded-full';
-                document.getElementById('admin-control-panel').classList.remove('hidden');
-            } else {
-                document.getElementById('role-badge').innerText = '企業用戶 (數據已隔離)';
-                document.getElementById('role-badge').className = 'text-xs bg-emerald-400 text-slate-900 font-bold px-2.5 py-0.5 rounded-full';
-                document.getElementById('admin-control-panel').classList.add('hidden');
-            }
-
-            loadCloudData();
-        }
-
-        function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value.trim();
-
-            if (email === 'admin@esg.com') {
-                quickLogin('ADMIN');
-            } else if (email.includes('userB') || email.includes('companyB')) {
-                quickLogin('CompanyB');
-            } else {
-                quickLogin('CompanyA');
-            }
-        }
-
+        // 快速登入
         function quickLogin(roleType) {
             if (roleType === 'ADMIN') {
                 currentUser = { email: 'admin@esg.com', role: 'ADMIN', companyId: 'ALL', companyName: '全場域總管理中心' };
@@ -495,8 +482,11 @@
         }
 
         function enterApp() {
-            document.getElementById('auth-screen').classList.add('hidden');
-            document.getElementById('app-screen').classList.remove('hidden');
+            const authScreen = document.getElementById('auth-screen');
+            const appScreen = document.getElementById('app-screen');
+            
+            if (authScreen) authScreen.classList.add('hidden');
+            if (appScreen) appScreen.classList.remove('hidden');
 
             document.getElementById('header-company-name').innerText = currentUser.companyName;
             document.getElementById('user-display-email').innerText = currentUser.email;
@@ -544,7 +534,7 @@
                 });
         }
 
-        // ☁️ 雲端 POST 寫入 (透過 text/plain 與 no-cors 繞過阻擋)
+        // ☁️ 雲端 POST 寫入
         function handleModalSubmit(e) {
             e.preventDefault();
 
@@ -575,12 +565,10 @@
                 photoBase64: compressedPhotoBase64 || ''
             };
 
-            // 本地先儲存
             database.push(payload);
             localStorage.setItem('esg_database', JSON.stringify(database));
             filterData();
 
-            // 背景發送至 Google Apps Script
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -603,7 +591,6 @@
             });
         }
 
-        // 圖片壓縮
         function compressImage(event) {
             const file = event.target.files[0];
             if (!file) {
@@ -658,7 +645,6 @@
             const carbonReduced = totalWaste * 2.1;
             const vermicompost = totalWaste * 0.3;
 
-            // 計算參與總人次 (不重複填寫人名稱)
             const uniqueAuthors = new Set(records.map(i => i.author).filter(a => a && a.trim() !== ''));
 
             document.getElementById('kpi-total-waste').innerHTML = `${totalWaste.toFixed(1)} <span class="text-xs font-normal text-slate-500">kg</span>`;
