@@ -65,6 +65,11 @@
                 <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg transition duration-200">
                     📝 送出帳號申請
                 </button>
+                
+                <!-- 👇 新增：返回登入頁面按鈕 -->
+                <button type="button" onclick="switchAuthTab('login')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl transition text-xs">
+                    ↩️ 已經有帳號？返回登入頁面
+                </button>
             </form>
 
     <!-- =================================================================== -->
@@ -371,7 +376,7 @@
             }
         }
 
-        function handleRegister(e) {
+       function handleRegister(e) {
             e.preventDefault();
             const companyName = document.getElementById('reg-company-name').value.trim();
             const email = document.getElementById('reg-email').value.trim();
@@ -402,6 +407,31 @@
                 console.error("註冊同步失敗:", err);
                 alert('⚠️ 網路連線異常，請檢查 Apps Script 設定');
             });
+        }
+
+        function enterApp() {
+            // 確保確實隱藏驗證/註冊畫面，並顯示主儀表板畫面
+            const authScreen = document.getElementById('auth-screen');
+            const appScreen = document.getElementById('app-screen');
+            
+            if (authScreen) authScreen.classList.add('hidden');
+            if (appScreen) appScreen.classList.remove('hidden');
+
+            document.getElementById('header-company-name').innerText = currentUser.companyName;
+            document.getElementById('user-display-email').innerText = currentUser.email;
+            document.getElementById('user-display-company').innerText = currentUser.companyName;
+
+            if (currentUser.role === 'ADMIN') {
+                document.getElementById('role-badge').innerText = '總管理者 (全場域視角)';
+                document.getElementById('role-badge').className = 'text-xs bg-amber-400 text-slate-900 font-extrabold px-2.5 py-0.5 rounded-full';
+                document.getElementById('admin-control-panel').classList.remove('hidden');
+            } else {
+                document.getElementById('role-badge').innerText = '企業用戶 (數據已隔離)';
+                document.getElementById('role-badge').className = 'text-xs bg-emerald-400 text-slate-900 font-bold px-2.5 py-0.5 rounded-full';
+                document.getElementById('admin-control-panel').classList.add('hidden');
+            }
+
+            loadCloudData();
         }
 
         function handleLogin(e) {
