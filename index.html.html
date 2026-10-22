@@ -72,17 +72,15 @@
     <!-- =================================================================== -->
     <!-- 2. 主儀表板介面 (Dashboard View) -->
     <!-- =================================================================== -->
- <div id="app-screen" class="hidden min-h-screen pb-12">
+    <div id="app-screen" class="hidden min-h-screen pb-12">
         
         <!-- Top Header Navigation -->
-        <header class="bg-emerald-900 text-white shadow-md sticky top-0 z-40">
+        <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap justify-between items-center gap-4">
                 <div class="flex items-center space-x-3">
                     <div class="p-2.5 bg-emerald-500 rounded-xl text-slate-900 text-xl font-bold">🏢</div>
                     <div>
-
                         <h1 class="text-xl font-bold tracking-wide flex items-center gap-2">
-
                             <span id="header-company-name">永續行動影響力</span>
                             <span id="role-badge" class="text-xs bg-emerald-400 text-slate-900 font-extrabold px-2.5 py-0.5 rounded-full">驗證成功</span>
                         </h1>
@@ -95,23 +93,21 @@
                         <p id="user-display-email" class="text-xs font-semibold text-white"></p>
                         <p id="user-display-company" class="text-[10px] text-emerald-400"></p>
                     </div>
-
-                <button onclick="loadCloudData()" class="bg-forest-500 hover:bg-forest-700 text-white border border-emerald-400 px-3 py-2 rounded-lg text-sm font-medium flex items-center shadow-sm transition">
-                    <i data-lucide="refresh-cw" class="w-4 h-4 mr-1.5" id="sync-spinner"></i> 同步雲端
-                </button>
-                <button onclick="openModal('waste')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-2 rounded-lg text-sm font-medium flex items-center shadow-sm transition">
-                    <i data-lucide="plus-circle" class="w-4 h-4 mr-1.5"></i> 減碳行動
-                </button>
-                <button onclick="openModal('bio')" class="bg-forest-700 hover:bg-black text-white px-3 py-2 rounded-lg text-sm font-medium flex items-center shadow-sm transition">
-                    <i data-lucide="bug" class="w-4 h-4 mr-1.5"></i> 生態觀察
-                </button>
-                <button onclick="handleLogout()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition">
+                    <button onclick="loadCloudData()" id="sync-btn" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition">
+                        <span id="sync-icon">🔄</span> 同步雲端
+                    </button>
+                    <button onclick="openModal('waste')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-sm transition">
+                        ➕ 減碳行動
+                    </button>
+                    <button onclick="openModal('bio')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-sm transition">
+                        🐞 生態觀察
+                    </button>
+                    <button onclick="handleLogout()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition">
                         🚪 登出
-                </button>
+                    </button>
+                </div>
             </div>
-         </div>
-         </header>
-                   
+        </header>
 
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
@@ -351,7 +347,7 @@
 
     <!-- Application JavaScript Logic -->
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkKhnQhkXEbVtpTY_JYPb-rk9semLGGTnxDatMqHr8jTP_S6Gdbs-SY95L1alOSNNJcA/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxg7JUBXZ8qZsthmL2IrCdvOB92OOAFYdaK8SGO6l5W2naNf7603EjfkbZzJkud4D40xw/exec";
 
         let database = [];
         let registeredCompanies = [];
