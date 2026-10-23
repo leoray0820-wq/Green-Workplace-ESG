@@ -1,1174 +1,589 @@
 <!DOCTYPE html>
-
 <html lang="zh-TW">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>ESG 永續行動影響力 | 雲端管理平台</title>
-
     <!-- Tailwind CSS CDN -->
-
     <script src="https://cdn.tailwindcss.com"></script>
-
     <!-- Chart.js CDN -->
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <style>
-
         .modal-blur { backdrop-filter: blur(4px); }
-
     </style>
-
 </head>
-
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
-
-
-
     <!-- =================================================================== -->
-
     <!-- 1. 登入/註冊 介面 (Auth View) -->
-
     <!-- =================================================================== -->
-
     <div id="auth-screen" class="fixed inset-0 z-50 bg-slate-900 flex items-center justify-center p-4 overflow-y-auto">
-
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 space-y-6 border border-slate-200 my-auto">
-
             <div class="text-center space-y-2">
-
                 <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-2 text-2xl font-bold">
-
                     🛡️
-
                 </div>
-
                 <h2 class="text-2xl font-bold text-slate-800">ESG 永續行動影響力</h2>
-
                 <p class="text-xs text-slate-400">GRI 306 & TNFD 雲端管理系統</p>
-
             </div>
-
-
 
             <!-- 切換 Tab (登入 / 註冊) -->
-
             <div class="flex border-b border-slate-200 text-sm font-bold">
-
                 <button id="tab-login-btn" onclick="switchAuthTab('login')" class="w-1/2 py-2 border-b-2 border-emerald-500 text-emerald-600">帳號登入</button>
-
                 <button id="tab-register-btn" onclick="switchAuthTab('register')" class="w-1/2 py-2 border-b-2 border-transparent text-slate-400 hover:text-slate-600">申請註冊</button>
-
             </div>
 
-
-
             <!-- 登入表單 -->
-
             <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
-
                 <div>
-
                     <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">帳號 (Email)</label>
-
                     <input type="email" id="login-email" list="saved-emails" value="" required placeholder="輸入或選擇 Email" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50">
-
                     <datalist id="saved-emails"></datalist>
-
                 </div>
-
                 <div>
-
                     <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">密碼</label>
-
                     <input type="password" id="login-password" value="" required placeholder="••••••••" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50">
-
                 </div>
-
-
 
                 <!-- 記住我勾選方塊 -->
-
                 <div class="flex items-center space-x-2 text-xs text-slate-600">
-
                     <input type="checkbox" id="remember-me" onchange="handleRememberMeChange()" class="w-4 h-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500 cursor-pointer">
-
                     <label for="remember-me" class="cursor-pointer select-none">記住我 (儲存帳號密碼)</label>
-
                 </div>
-
-
 
                 <button type="submit" id="login-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg transition duration-200">
-
                     🔑 驗證登入
-
                 </button>
-
             </form>
-
-
 
             <!-- 註冊表單 -->
-
             <form id="register-form" onsubmit="handleRegister(event)" class="space-y-3 hidden">
-
                 <div>
-
                     <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">組織名稱/個人</label>
-
                     <input type="text" id="reg-company-name" required placeholder="例如：綠色科技股份有限公司" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50">
-
                 </div>
-
                 <div>
-
                     <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">申請人 Email (登入帳號)</label>
-
                     <input type="email" id="reg-email" required placeholder="user@company.com" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50">
-
                 </div>
-
                 <div>
-
                     <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">設定密碼</label>
-
                     <input type="password" id="reg-password" required placeholder="••••••••" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50">
-
                 </div>
-
                 <button type="submit" id="reg-submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg transition duration-200">
-
                     📝 送出帳號申請
-
                 </button>
-
             </form>
-
         </div>
-
     </div>
 
-
-
     <!-- =================================================================== -->
-
     <!-- 2. 主儀表板介面 (Dashboard View) -->
-
     <!-- =================================================================== -->
 
     <div id="app-screen" class="hidden min-h-screen pb-12">
-
-        
-
+   
         <!-- Top Header Navigation -->
-
         <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40">
-
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap justify-between items-center gap-4">
-
                 <div class="flex items-center space-x-3">
-
                     <div class="p-2.5 bg-emerald-500 rounded-xl text-slate-900 text-xl font-bold">🏢</div>
-
                     <div>
-
                         <h1 class="text-xl font-bold tracking-wide flex items-center gap-2">
-
                             <span id="header-company-name">永續行動影響力</span>
-
                             <span id="role-badge" class="text-xs bg-emerald-400 text-slate-900 font-extrabold px-2.5 py-0.5 rounded-full">驗證成功</span>
-
                         </h1>
-
                         <p class="text-xs text-slate-400">GRI 306 & TNFD 雲端數據管理系統</p>
-
                     </div>
-
                 </div>
-
-                
+           
 
                 <div class="flex items-center space-x-3">
-
                     <div class="text-right hidden sm:block">
-
                         <p id="user-display-email" class="text-xs font-semibold text-white"></p>
-
                         <p id="user-display-company" class="text-[10px] text-emerald-400"></p>
-
                     </div>
-
                     <button onclick="loadCloudData()" id="sync-btn" class="hidden bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition">
-
                         <span id="sync-icon">🔄</span> 同步雲端
-
                     </button>
-
                     <button onclick="openModal('waste')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-sm transition">
-
                         ➕ 減碳行動
-
                     </button>
-
                     <button onclick="openModal('bio')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-sm transition">
-
                         🐞 生態觀察
-
                     </button>
-
                     <button onclick="handleLogout()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition">
-
                         🚪 登出
-
                     </button>
-
                 </div>
-
             </div>
-
         </header>
-
-
-
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-
-
             <!-- 總管理者專屬切換面板 -->
-
             <div id="admin-control-panel" class="hidden bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-4">
-
                 <div class="flex items-center space-x-3">
-
                     <span class="text-2xl">👑</span>
-
                     <div>
-
                         <h3 class="text-sm font-bold text-amber-900">總管監控面板 (Super Admin Overview)</h3>
-
                         <p class="text-xs text-amber-700">您可以切換單位檢視影響力，或觀看所有單位彙總總覽</p>
-
                     </div>
-
                 </div>
-
                 <div>
-
                     <select id="admin-company-select" onchange="filterData()" class="border border-amber-400 rounded-xl px-3 py-2 text-xs font-bold text-amber-900 focus:ring-2 focus:ring-amber-500 outline-none bg-white">
-
                         <option value="ALL">🌐 所有單位彙總 (Total Overview)</option>
-
                     </select>
-
                 </div>
-
             </div>
-
-
 
             <!-- 方法學合規說明區塊 -->
-
             <div class="bg-emerald-900/5 border border-emerald-500/20 rounded-2xl p-5">
-
                 <div class="flex items-center justify-between mb-3">
-
                     <h3 class="font-bold text-slate-800 text-xs tracking-wide flex items-center gap-1.5">
-
                         <span>📋</span> 第三方稽核與方法學合規聲明 (GRI & TNFD Framework)
-
                     </h3>
-
                     <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">符合國際標準</span>
-
                 </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-slate-600">
-
                     <div class="bg-white/80 p-3 rounded-xl border border-emerald-100">
-
                         <p class="font-bold text-slate-700 mb-0.5">1. 國際公認框架 (Baseline)</p>
-
                         <p class="text-[11px] text-slate-500">減碳遵循 IPCC 2006 掩埋替代法；生態觀察依循 TNFD 自然相關財務揭露指標。</p>
-
                     </div>
-
                     <div class="bg-white/80 p-3 rounded-xl border border-emerald-100">
-
                         <p class="font-bold text-slate-700 mb-0.5">2. 保守估計原則 (Conservativeness)</p>
-
                         <p class="text-[11px] text-slate-500">採用保守 2.1 kg CO₂e/kg 替代係數；生態活躍度透過 1-5 星量化追蹤。</p>
-
                     </div>
-
                     <div class="bg-white/80 p-3 rounded-xl border border-emerald-100">
-
                         <p class="font-bold text-slate-700 mb-0.5">3. 個人與團隊行動影響力</p>
-
                         <p class="text-[11px] text-slate-500">追蹤「永續行動」、參與總人次與累計頻次，量化組織成員之永續足跡。</p>
-
                     </div>
-
                 </div>
-
             </div>
-
-
 
             <!-- KPI 與影響力數據看板 -->
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-
                 <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
-
                     <p class="text-xs font-semibold text-slate-400 uppercase">廢棄物轉化量</p>
-
                     <p class="text-2xl font-bold text-slate-800 my-1" id="kpi-total-waste">0.0 <span class="text-xs font-normal text-slate-500">kg</span></p>
-
                     <p class="text-[10px] text-emerald-600">GRI 306-4 規範</p>
-
                 </div>
-
-
-
                 <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
-
                     <p class="text-xs font-semibold text-slate-400 uppercase">範疇三減碳效益</p>
-
                     <p class="text-2xl font-bold text-slate-800 my-1" id="kpi-carbon-reduced">0.0 <span class="text-xs font-normal text-slate-500">kg CO₂e</span></p>
-
                     <p class="text-[10px] text-teal-600">IPCC 保守係數 2.1</p>
-
                 </div>
-
-
-
                 <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
-
                     <p class="text-xs font-semibold text-slate-400 uppercase">產出有機蚓糞肥</p>
-
                     <p class="text-2xl font-bold text-slate-800 my-1" id="kpi-vermicompost">0.0 <span class="text-xs font-normal text-slate-500">kg</span></p>
-
                     <p class="text-[10px] text-amber-600">SOC 土壤碳匯效益</p>
-
                 </div>
-
-
-
                 <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
-
                     <p class="text-xs font-semibold text-slate-400 uppercase">參與總人次 (永續行動)</p>
-
                     <p class="text-2xl font-bold text-slate-800 my-1" id="kpi-total-people">0 <span class="text-xs font-normal text-slate-500">人</span></p>
-
                     <p class="text-[10px] text-indigo-600">個人與影響力追蹤</p>
-
                 </div>
-
-
-
                 <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
-
                     <p class="text-xs font-semibold text-slate-400 uppercase">累積行動總次數</p>
-
                     <p class="text-2xl font-bold text-slate-800 my-1" id="kpi-total-actions">0 <span class="text-xs font-normal text-slate-500">次行動</span></p>
-
                     <p class="text-[10px] text-emerald-600">雲端透明化存證</p>
-
                 </div>
-
             </div>
-
-
 
             <!-- 4 大核心圖表 -->
-
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-
                 <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
-
                     <h3 class="text-xs font-bold text-slate-800 mb-1 flex items-center gap-1.5"><span class="text-emerald-500">📈</span> 廢棄物轉化趨勢</h3>
-
                     <p class="text-[10px] text-slate-400 mb-2">每日處理重量 (kg)</p>
-
                     <div class="h-44"><canvas id="chart-waste-trend"></canvas></div>
-
                 </div>
 
-
-
                 <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
-
                     <h3 class="text-xs font-bold text-slate-800 mb-1 flex items-center gap-1.5"><span class="text-emerald-500">🥧</span> 資材種類佔比</h3>
-
                     <p class="text-[10px] text-slate-400 mb-2">有機廢棄物分佈</p>
-
                     <div class="h-44 relative flex items-center justify-center"><canvas id="chart-waste-category"></canvas></div>
-
                 </div>
 
-
-
                 <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
-
                     <h3 class="text-xs font-bold text-slate-800 mb-1 flex items-center gap-1.5"><span class="text-indigo-500">📉</span> 生物多樣性趨勢</h3>
-
                     <p class="text-[10px] text-slate-400 mb-2">生態活躍度評分 (1-5 星)</p>
-
                     <div class="h-44"><canvas id="chart-bio-trend"></canvas></div>
-
                 </div>
-
-
 
                 <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
-
                     <h3 class="text-xs font-bold text-slate-800 mb-1 flex items-center gap-1.5"><span class="text-indigo-500">🐞</span> 生態主題佔比</h3>
-
                     <p class="text-[10px] text-slate-400 mb-2">觀察物種與生態現象</p>
-
                     <div class="h-44 relative flex items-center justify-center"><canvas id="chart-bio-category"></canvas></div>
-
                 </div>
-
             </div>
-
-
 
             <!-- 歷史稽核數據清單 -->
 
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-
                 <div class="p-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4">
-
                     <div>
-
                         <h2 class="text-base font-bold text-slate-800">歷史稽核與行動數據清單</h2>
-
                         <p class="text-xs text-slate-400">各帳號可針對自己上傳的資料進行編輯修改或刪除</p>
-
                     </div>
-
                     <div class="flex items-center space-x-3">
-
                         <input type="text" id="table-search" oninput="filterData()" placeholder="搜尋填寫人、部門或主題..." class="border border-slate-200 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
-
                         <button onclick="exportCSV()" class="bg-slate-900 hover:bg-black text-white px-4 py-2 rounded-xl text-xs font-bold transition">
-
                             📥 導出報表 (CSV)
-
                         </button>
-
                     </div>
-
                 </div>
-
-
 
                 <div class="overflow-x-auto">
-
                     <table class="w-full text-left border-collapse text-xs">
-
                         <thead>
-
                             <tr class="bg-slate-50 text-slate-500 uppercase tracking-wider border-b border-slate-100">
-
                                 <th class="p-3.5">所屬組織/個人</th>
-
                                 <th class="p-3.5">憑證照片</th>
-
                                 <th class="p-3.5">日期</th>
-
                                 <th class="p-3.5">類型</th>
-
                                 <th class="p-3.5">細項類別 / 主題</th>
-
                                 <th class="p-3.5">數量 / 評分</th>
-
                                 <th class="p-3.5">估算減碳量</th>
-
                                 <th class="p-3.5">記錄單位</th>
-
                                 <th class="p-3.5">填寫人</th>
-
                                 <th class="p-3.5">現場備註</th>
-
                                 <th class="p-3.5 text-center">操作</th>
-
                             </tr>
-
                         </thead>
-
                         <tbody id="data-table-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
-
                     </table>
-
                 </div>
-
             </div>
-
         </main>
-
     </div>
-
-
 
     <!-- Modal Form (雙軌填報與編輯視窗) -->
 
     <div id="modal" class="fixed inset-0 bg-black/60 modal-blur z-50 flex items-center justify-center hidden p-4">
-
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
-
             <div class="bg-slate-900 text-white p-5 px-6 flex justify-between items-center">
-
                 <h3 id="modal-title" class="text-base font-bold flex items-center gap-2">
-
                     <span>☁️</span> 填報雲端數據
-
                 </h3>
-
                 <button onclick="closeModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
-
             </div>
 
-
-
             <form id="record-form" onsubmit="handleModalSubmit(event)" class="p-6 space-y-4 overflow-y-auto flex-1 text-xs">
-
                 <input type="hidden" id="form-id" value="">
-
                 <input type="hidden" id="form-type" value="waste">
 
-
-
                 <div>
-
                     <label class="block font-semibold text-slate-600 uppercase mb-1">日期</label>
-
                     <input type="date" id="form-date" required class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none">
-
                 </div>
-
-
 
                 <div id="field-category-waste">
-
                     <label class="block font-semibold text-slate-600 uppercase mb-1">廢棄物/資材種類</label>
-
                     <select id="form-category-waste" class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none">
-
                         <option value="咖啡渣">咖啡渣</option>
-
                         <option value="茶渣">茶葉渣/茶包</option>
-
                         <option value="生廚餘">生廚餘 (植物性)</option>
-
                         <option value="熟廚餘">熟廚餘</option>
-
                         <option value="落葉與枯枝">落葉與枯枝</option>
-
                     </select>
-
                 </div>
-
-
 
                 <div id="field-amount-waste">
-
                     <label class="block font-semibold text-slate-600 uppercase mb-1">投放重量 (kg)</label>
-
                     <input type="number" step="0.1" id="form-amount" placeholder="例如：12.5" class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none">
-
                 </div>
-
-
 
                 <div id="field-bio-details" class="hidden space-y-4">
-
                     <div>
-
                         <label class="block font-semibold text-slate-600 uppercase mb-1">觀察主題 / 物種名稱</label>
-
                         <input type="text" id="form-bio-title" placeholder="例如：蚯蚓活躍度 / 土壤生物觀察" class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none">
-
                     </div>
-
                     <div>
-
                         <label class="block font-semibold text-slate-600 uppercase mb-1">生態活躍度評分 (1-5 星)</label>
-
                         <select id="form-worm-rating" class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none">
-
                             <option value="5">⭐⭐⭐⭐⭐ (極度活躍/集群明顯)</option>
-
                             <option value="4">⭐⭐⭐⭐ (良好進食)</option>
-
                             <option value="3">⭐⭐⭐ (正常活動)</option>
-
                             <option value="2">⭐⭐ (活動偏緩慢)</option>
-
                             <option value="1">⭐ (需要調整環境濕度)</option>
-
                         </select>
-
                     </div>
-
                 </div>
-
-
 
                 <!-- 現場照片欄位 -->
-
                 <div>
-
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1 flex items-center justify-between">
-
                         <span>現場照片存證 (自動上傳雲端硬碟)</span>
-
                         <span class="text-rose-500 font-bold">* 必填照片憑證</span>
-
                         <span class="text-slate-400 font-normal">(編輯時若不選則保留原照片)</span>
-
                     </label>
-
                     <input type="file" id="form-photo" accept="image/*" required onchange="compressImage(event)" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-600 hover:file:bg-emerald-100">
-
                     <div id="photo-preview-container" class="mt-3 hidden relative w-32 h-32 rounded-lg border border-slate-200 overflow-hidden">
-
                         <img id="photo-preview" src="" class="w-full h-full object-cover">
-
                     </div>
-
                     
-
                     <!-- AI 比對結果顯示框 -->
-
                     <div id="ai-verify-badge" class="hidden"></div>
-
                 </div>
-
                
-
                 <div class="grid grid-cols-2 gap-3">
-
                     <div>
-
                         <label class="block font-semibold text-slate-600 uppercase mb-1">記錄單位</label>
-
                         <input type="text" id="form-dept" placeholder="行政總務部" required class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none">
-
                     </div>
-
                     <div>
-
                         <label class="block font-semibold text-slate-600 uppercase mb-1">填寫人</label>
-
                         <input type="text" id="form-author" placeholder="王小明" required class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none">
-
                     </div>
-
                 </div>
-
-
 
                 <div>
-
                     <label class="block font-semibold text-slate-600 uppercase mb-1">備註 / 現場紀錄</label>
-
                     <textarea id="form-notes" rows="2" placeholder="紀錄現場氣味、濕度或特異觀察..." class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
-
                 </div>
-
-
 
                 <div class="pt-2 flex justify-end space-x-3">
-
                     <button type="button" onclick="closeModal()" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50">取消</button>
-
                     <button type="submit" id="submit-btn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-sm">確認並同步雲端</button>
-
                 </div>
-
             </form>
-
         </div>
-
     </div>
 
-
-
     <!-- Application JavaScript Logic -->
-
     <script>
-
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkKhnQhkXEbVtpTY_JYPb-rk9semLGGTnxDatMqHr8jTP_S6Gdbs-SY95L1alOSNNJcA/exec";
 
-
-
         let database = [];
-
         let registeredCompanies = [];
-
         let currentUser = null;
-
         let compressedPhotoBase64 = '';
-
         let cWasteTrend = null, cWasteCat = null, cBioTrend = null, cBioCat = null;
 
-
-
         // 網頁載入時：初始化日期、渲染歷史帳號選單與記住的憑證
-
         window.onload = function() {
-
             document.getElementById('form-date').value = new Date().toISOString().split('T')[0];
-
             
-
             // 渲染歷史輸入過的登入帳號下拉選單
-
             updateEmailDatalist();
 
-
-
             const savedEmail = localStorage.getItem('esg_saved_email');
-
             const savedPassword = localStorage.getItem('esg_saved_password');
-
             if (savedEmail && savedPassword) {
-
                 document.getElementById('login-email').value = savedEmail;
-
                 document.getElementById('login-password').value = savedPassword;
-
                 document.getElementById('remember-me').checked = true;
-
             }
-
             // 設定每 60 秒自動在背景同步一次雲端資料
-
             setInterval(function() {
-
                 if (currentUser) {
-
                     loadCloudData();
-
                 }
-
             }, 60000);
-
         };
 
-
-
         // 更新歷史帳號下拉選單
-
         function updateEmailDatalist() {
-
             const datalist = document.getElementById('saved-emails');
-
             if (!datalist) return;
-
             
-
             const historyEmails = JSON.parse(localStorage.getItem('esg_email_history') || '[]');
-
             let html = '';
 
             historyEmails.forEach(email => {
-
                 html += `<option value="${email}">`;
-
             });
-
             datalist.innerHTML = html;
-
         }
-
-
 
         function switchAuthTab(tab) {
-
             const loginForm = document.getElementById('login-form');
-
             const regForm = document.getElementById('register-form');
-
             const loginBtn = document.getElementById('tab-login-btn');
-
             const regBtn = document.getElementById('tab-register-btn');
 
-
-
             if (tab === 'login') {
-
                 loginForm.classList.remove('hidden');
-
                 regForm.classList.add('hidden');
-
                 loginBtn.className = "w-1/2 py-2 border-b-2 border-emerald-500 text-emerald-600 font-bold";
-
                 regBtn.className = "w-1/2 py-2 border-b-2 border-transparent text-slate-400 hover:text-slate-600";
-
             } else {
-
                 loginForm.classList.add('hidden');
-
                 regForm.classList.remove('hidden');
-
                 regBtn.className = "w-1/2 py-2 border-b-2 border-indigo-500 text-indigo-600 font-bold";
-
                 loginBtn.className = "w-1/2 py-2 border-b-2 border-transparent text-slate-400 hover:text-slate-600";
-
             }
-
         }
-
-
 
         // 處理註冊邏輯（送出時立即清空欄位）
-
         function handleRegister(e) {
-
             e.preventDefault();
-
             const btn = document.getElementById('reg-submit-btn');
-
             btn.disabled = true;
-
             btn.innerHTML = "⏳ 正在驗證與註冊...";
 
-
-
             const companyName = document.getElementById('reg-company-name').value.trim();
-
             const email = document.getElementById('reg-email').value.trim();
-
             const password = document.getElementById('reg-password').value.trim();
-
             const companyId = "Comp_" + Date.now();
 
-
-
             // 🔽 點擊送出後立刻清空註冊輸入框
-
             document.getElementById('register-form').reset();
 
-
-
             const payload = {
-
                 action: "register",
-
                 companyName: companyName,
-
                 email: email,
-
                 password: password,
-
                 companyId: companyId
-
             };
 
-
-
             fetch(GOOGLE_SCRIPT_URL, {
-
                 method: 'POST',
-
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-
                 body: JSON.stringify(payload)
-
             })
-
             .then(res => res.json())
-
             .then(res => {
-
                 if (res.status === "duplicate") {
-
                     alert("⚠️ " + res.message);
-
                     switchAuthTab('login');
-
                 } else if (res.status === "success") {
-
                     alert(`🎉 帳號申請成功！\n${companyName}\n帳號：${email}`);
-
                     currentUser = { email: email, role: 'USER', companyId: companyId, companyName: companyName };
-
                     enterApp();
-
                 } else {
-
                     alert("註冊發生錯誤：" + (res.message || "未知原因"));
-
                 }
-
             })
-
             .catch(err => {
-
                 console.error("註冊失敗:", err);
-
                 alert("⚠️ 網路連線異常，請檢查網路狀態。");
-
             })
-
             .finally(() => {
-
                 btn.disabled = false;
-
                 btn.innerHTML = "📝 送出帳號申請";
-
             });
-
         }
-
-
 
         // 處理「記住我」勾選框切換事件
-
         function handleRememberMeChange() {
-
             const checkbox = document.getElementById('remember-me');
-
             const emailInput = document.getElementById('login-email');
-
             const passwordInput = document.getElementById('login-password');
 
-
-
             if (checkbox.checked) {
-
                 if (emailInput.value.trim() && passwordInput.value.trim()) {
-
                     localStorage.setItem('esg_saved_email', emailInput.value.trim());
-
                     localStorage.setItem('esg_saved_password', passwordInput.value.trim());
-
                 }
-
             } else {
-
                 localStorage.removeItem('esg_saved_email');
-
                 localStorage.removeItem('esg_saved_password');
-
                 emailInput.value = '';
-
                 passwordInput.value = '';
-
             }
-
         }
-
-
 
         // 處理登入邏輯（更新歷史紀錄並處理「記住我」）
-
         function handleLogin(e) {
-
             e.preventDefault();
-
             const email = document.getElementById('login-email').value.trim();
-
             const password = document.getElementById('login-password').value.trim();
-
             const rememberChecked = document.getElementById('remember-me').checked;
 
-
-
             // 儲存至歷史帳號清單 (最多保留 5 筆)
-
             if (email) {
-
                 let historyEmails = JSON.parse(localStorage.getItem('esg_email_history') || '[]');
-
                 if (!historyEmails.includes(email)) {
-
                     historyEmails.unshift(email);
-
                     if (historyEmails.length > 5) historyEmails.pop();
-
                     localStorage.setItem('esg_email_history', JSON.stringify(historyEmails));
-
                     updateEmailDatalist();
-
                 }
-
             }
-
-
 
             if (rememberChecked) {
-
                 localStorage.setItem('esg_saved_email', email);
-
                 localStorage.setItem('esg_saved_password', password);
-
             } else {
-
                 // 如果未勾選記住我，強制清除快取與輸入框
-
                 localStorage.removeItem('esg_saved_email');
-
                 localStorage.removeItem('esg_saved_password');
-
                 document.getElementById('login-email').value = '';
-
                 document.getElementById('login-password').value = '';
-
             }
-
-
 
             if (email === 'admin@esg.com' && password === 'admin123') {
-
                 currentUser = { email: 'admin@esg.com', role: 'ADMIN', companyId: 'ALL', companyName: '總管控制中心' };
-
                 enterApp();
-
                 return;
-
             }
 
-
-
             const btn = document.getElementById('login-btn');
-
             btn.disabled = true;
-
             btn.innerHTML = "⏳ 驗證中...";
 
-
-
             const payload = {
-
                 action: "login",
-
                 email: email,
-
                 password: password
-
             };
 
-
-
             fetch(GOOGLE_SCRIPT_URL, {
-
                 method: 'POST',
-
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-
                 body: JSON.stringify(payload)
-
             })
-
             .then(res => res.json())
-
             .then(res => {
-
                 if (res.status === "success") {
-
                     currentUser = {
-
                         email: res.email,
-
                         role: 'USER',
-
                         companyId: res.companyId,
-
                         companyName: res.companyName
-
                     };
-
                     enterApp();
-
                 } else {
-
                     alert('⚠️ 登入失敗：帳號或密碼錯誤。');
-
                 }
-
             })
-
             .catch(err => {
-
                 console.error("登入連線失敗:", err);
-
                 alert('⚠️ 雲端連線異常，請檢查網路。');
-
             })
-
             .finally(() => {
-
                 btn.disabled = false;
-
                 btn.innerHTML = "🔑 驗證登入";
-
             });
-
         }
-
-
 
         function enterApp() {
 
             document.getElementById('auth-screen').classList.add('hidden');
-
             document.getElementById('app-screen').classList.remove('hidden');
-
-
-
             document.getElementById('header-company-name').innerText = currentUser.companyName;
-
             document.getElementById('user-display-email').innerText = currentUser.email;
-
             document.getElementById('user-display-company').innerText = currentUser.companyName;
 
-
-
             if (currentUser.role === 'ADMIN') {
-
                 document.getElementById('role-badge').innerText = '總管';
-
                 document.getElementById('role-badge').className = 'text-xs bg-amber-400 text-slate-900 font-extrabold px-2.5 py-0.5 rounded-full';
-
                 document.getElementById('admin-control-panel').classList.remove('hidden');
-
             } else {
-
                 document.getElementById('role-badge').innerText = '一般用戶';
-
                 document.getElementById('role-badge').className = 'text-xs bg-emerald-400 text-slate-900 font-bold px-2.5 py-0.5 rounded-full';
-
                 document.getElementById('admin-control-panel').classList.add('hidden');
-
             }
 
-
-
             loadCloudData();
-
         }
 
-
-
         function handleLogout() {
-
             currentUser = null;
-
             document.getElementById('app-screen').classList.add('hidden');
-
             document.getElementById('auth-screen').classList.remove('hidden');
-
-            
+          
 
             // 登出時如果沒勾選記住我，清空欄位
 
