@@ -93,7 +93,7 @@
                         <p id="user-display-email" class="text-xs font-semibold text-white"></p>
                         <p id="user-display-company" class="text-[10px] text-emerald-400"></p>
                     </div>
-                    <button onclick="loadCloudData()" id="sync-btn" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition">
+                    <button onclick="loadCloudData()" id="sync-btn" class="hidden bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition">
                         <span id="sync-icon">🔄</span> 同步雲端
                     </button>
                     <button onclick="openModal('waste')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-sm transition">
@@ -356,8 +356,15 @@
         let cWasteTrend = null, cWasteCat = null, cBioTrend = null, cBioCat = null;
 
         window.onload = function() {
-            document.getElementById('form-date').value = new Date().toISOString().split('T')[0];
-        };
+    document.getElementById('form-date').value = new Date().toISOString().split('T')[0];
+    
+    // 設定每 60 秒自動在背景同步一次雲端資料
+    setInterval(function() {
+        if (currentUser) {
+            loadCloudData();
+        }
+    }, 60000);
+};
 
         function switchAuthTab(tab) {
             const loginForm = document.getElementById('login-form');
