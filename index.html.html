@@ -277,10 +277,16 @@
                     <input type="date" id="form-date" required class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
 
-               <div id="field-category-waste">
-                   <label class="block font-semibold text-slate-600 uppercase mb-1">廢棄物/資材種類 (AI 將自動辨識填入)</label>
-                   <input type="text" id="form-category-waste" placeholder="上傳照片後 AI 自動判定..." class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50">
-               </div>
+                <div id="field-category-waste">
+                    <label class="block font-semibold text-slate-600 uppercase mb-1">廢棄物/資材種類</label>
+                    <select id="form-category-waste" class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none">
+                        <option value="咖啡渣">咖啡渣</option>
+                        <option value="茶渣">茶葉渣/茶包</option>
+                        <option value="生廚餘">生廚餘 (植物性)</option>
+                        <option value="熟廚餘">熟廚餘</option>
+                        <option value="落葉與枯枝">落葉與枯枝</option>
+                    </select>
+                </div>
 
                 <div id="field-amount-waste">
                     <label class="block font-semibold text-slate-600 uppercase mb-1">投放重量 (kg)</label>
@@ -346,7 +352,7 @@
 
     <!-- Application JavaScript Logic -->
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOIHaS5rSWEG9Xz_cKqbswUHWC2encj7PvbgFY_WH_baA3winoj7uRJONHV4yrHO_K7g/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIwCO7ia6CpD1tCPszaKBJLVd04a2Uozwres6vZV7Yc3bHj0hJARiMs_gFu2czVPma-A/exec";
 
         let database = [];
         let registeredCompanies = [];
@@ -782,54 +788,54 @@
             reader.readAsDataURL(file);
         }
 
-        // 🤖 發送 AI 照片比對請求並自動填入種類
-function runAiPhotoVerification() {
-    const type = document.getElementById('form-type').value;
-    const isWaste = type === 'waste';
-    
-    // 如果是新增時還沒選類別，可以先給 AI 一個預判提示
-    const categoryInput = isWaste ? document.getElementById('form-category-waste') : document.getElementById('form-bio-title');
-    const currentCategory = categoryInput.value || (isWaste ? '有機廢棄物' : '生態觀察');
+        function runAiPhotoVerification() {
+            if (!compressedPhotoBase64) return;
 
-    const badge = document.getElementById('ai-verify-badge');
-    if (!badge) return;
+            const type = document.getElementById('form-type').value;
+            const isWaste = type === 'waste';
+            const category = isWaste 
+                ? document.getElementById('form-category-waste').value 
+                : (document.getElementById('form-bio-title').value || '生態觀察');
 
-    badge.classList.remove('hidden');
-    badge.className = "mt-2 p-2.5 text-xs rounded-xl bg-amber-50 border border-amber-200 text-amber-800 flex items-center gap-2";
-    badge.innerHTML = `<span>⏳</span> AI 正在分析照片並自動辨識資材種類...`;
+            const badge = document.getElementById('ai-verify-badge');
+            if (!badge) return;
 
-    const payload = {
-        action: "analyze_image",
-        photoBase64: compressedPhotoBase64,
-        expectedCategory: currentCategory,
-        type: type
-    };
+            badge.classList.remove('hidden');
+            badge.className = "mt-2 p-2.5 text-xs rounded-xl bg-amber-50 border border-amber-200 text-amber-800 flex items-center gap-2";
+            badge.innerHTML = `<span>⏳</span> AI 正在分析照片與「${category}」是否相符...`;
 
-    fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-    })
-    .then(res => res.json())
-    .then(res => {
-        if (res.status === "success") {
-            // 💡 核心新邏輯：直接將 AI 辨識出的項目自動填入對應欄位！
-            if (res.detectedContent && res.detectedContent !== "無法辨識") {
-                categoryInput.value = res.detectedContent;
-            }
+            const payload = {
+                action: "analyze_image",
+                photoBase64: compressedPhotoBase64,
+                expectedCategory: category,
+                type: type
+            };
 
-            badge.className = "mt-2 p-2.5 text-xs rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center gap-2";
-            badge.innerHTML = `<span>✅</span> <b>AI 自動辨識成功：</b>已自動填入「${res.detectedContent}」（${res.reason}）`;
-        } else {
-            badge.className = "mt-2 p-2.5 text-xs rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-2";
-            badge.innerHTML = `<span>⚠️</span> <b>AI 警告：</b>無法自動辨識，請手動填寫資材種類。`;
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.status === "success") {
+                    if (res.matched) {
+                        badge.className = "mt-2 p-2.5 text-xs rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center gap-2";
+                        badge.innerHTML = `<span>✅</span> <b>AI 辨識相符：</b>${res.detectedContent}（${res.reason}）`;
+                    } else {
+                        badge.className = "mt-2 p-2.5 text-xs rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-2";
+                        badge.innerHTML = `<span>⚠️</span> <b>AI 警告：</b>畫面可能是「${res.detectedContent}」，與選擇的「${category}」可能不符合。`;
+                    }
+                } else {
+                    badge.className = "mt-2 p-2.5 text-xs rounded-xl bg-slate-50 text-slate-500";
+                    badge.innerHTML = `ℹ️ AI 比對略過。`;
+                }
+            })
+            .catch(err => {
+                console.error("AI 比對連線失敗:", err);
+                badge.classList.add('hidden');
+            });
         }
-    })
-    .catch(err => {
-        console.error("AI 比對連線失敗:", err);
-        badge.classList.add('hidden');
-    });
-}
 
         function getAccessibleRecords() {
             if (!currentUser) return [];
