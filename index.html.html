@@ -13,6 +13,7 @@
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
+
     <!-- =================================================================== -->
     <!-- 1. 登入/註冊 介面 (Auth View) -->
     <!-- =================================================================== -->
@@ -79,9 +80,8 @@
     <!-- =================================================================== -->
     <!-- 2. 主儀表板介面 (Dashboard View) -->
     <!-- =================================================================== -->
-
     <div id="app-screen" class="hidden min-h-screen pb-12">
-   
+        
         <!-- Top Header Navigation -->
         <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap justify-between items-center gap-4">
@@ -95,8 +95,7 @@
                         <p class="text-xs text-slate-400">GRI 306 & TNFD 雲端數據管理系統</p>
                     </div>
                 </div>
-           
-
+                
                 <div class="flex items-center space-x-3">
                     <div class="text-right hidden sm:block">
                         <p id="user-display-email" class="text-xs font-semibold text-white"></p>
@@ -117,6 +116,7 @@
                 </div>
             </div>
         </header>
+
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
             <!-- 總管理者專屬切換面板 -->
@@ -160,28 +160,31 @@
             </div>
 
             <!-- KPI 與影響力數據看板 -->
-
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
                     <p class="text-xs font-semibold text-slate-400 uppercase">廢棄物轉化量</p>
                     <p class="text-2xl font-bold text-slate-800 my-1" id="kpi-total-waste">0.0 <span class="text-xs font-normal text-slate-500">kg</span></p>
                     <p class="text-[10px] text-emerald-600">GRI 306-4 規範</p>
                 </div>
+
                 <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
                     <p class="text-xs font-semibold text-slate-400 uppercase">範疇三減碳效益</p>
                     <p class="text-2xl font-bold text-slate-800 my-1" id="kpi-carbon-reduced">0.0 <span class="text-xs font-normal text-slate-500">kg CO₂e</span></p>
                     <p class="text-[10px] text-teal-600">IPCC 保守係數 2.1</p>
                 </div>
+
                 <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
                     <p class="text-xs font-semibold text-slate-400 uppercase">產出有機蚓糞肥</p>
                     <p class="text-2xl font-bold text-slate-800 my-1" id="kpi-vermicompost">0.0 <span class="text-xs font-normal text-slate-500">kg</span></p>
                     <p class="text-[10px] text-amber-600">SOC 土壤碳匯效益</p>
                 </div>
+
                 <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
                     <p class="text-xs font-semibold text-slate-400 uppercase">參與總人次 (永續行動)</p>
                     <p class="text-2xl font-bold text-slate-800 my-1" id="kpi-total-people">0 <span class="text-xs font-normal text-slate-500">人</span></p>
                     <p class="text-[10px] text-indigo-600">個人與影響力追蹤</p>
                 </div>
+
                 <div class="bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
                     <p class="text-xs font-semibold text-slate-400 uppercase">累積行動總次數</p>
                     <p class="text-2xl font-bold text-slate-800 my-1" id="kpi-total-actions">0 <span class="text-xs font-normal text-slate-500">次行動</span></p>
@@ -217,7 +220,6 @@
             </div>
 
             <!-- 歷史稽核數據清單 -->
-
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                 <div class="p-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4">
                     <div>
@@ -257,7 +259,6 @@
     </div>
 
     <!-- Modal Form (雙軌填報與編輯視窗) -->
-
     <div id="modal" class="fixed inset-0 bg-black/60 modal-blur z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
             <div class="bg-slate-900 text-white p-5 px-6 flex justify-between items-center">
@@ -388,7 +389,6 @@
             
             const historyEmails = JSON.parse(localStorage.getItem('esg_email_history') || '[]');
             let html = '';
-
             historyEmails.forEach(email => {
                 html += `<option value="${email}">`;
             });
@@ -559,9 +559,9 @@
         }
 
         function enterApp() {
-
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('app-screen').classList.remove('hidden');
+
             document.getElementById('header-company-name').innerText = currentUser.companyName;
             document.getElementById('user-display-email').innerText = currentUser.email;
             document.getElementById('user-display-company').innerText = currentUser.companyName;
@@ -583,774 +583,389 @@
             currentUser = null;
             document.getElementById('app-screen').classList.add('hidden');
             document.getElementById('auth-screen').classList.remove('hidden');
-          
-
+            
             // 登出時如果沒勾選記住我，清空欄位
-
             if (!document.getElementById('remember-me').checked) {
-
                 document.getElementById('login-email').value = '';
-
                 document.getElementById('login-password').value = '';
-
             }
-
         }
-
-
 
         function loadCloudData() {
-
             const syncIcon = document.getElementById('sync-icon');
-
             if (syncIcon) syncIcon.classList.add('animate-spin');
 
-
-
             fetch(GOOGLE_SCRIPT_URL)
-
                 .then(res => res.json())
-
                 .then(data => {
-
                     if (data && Array.isArray(data.records)) {
-
                         database = data.records;
-
                     }
-
                     if (data && Array.isArray(data.companies)) {
-
                         registeredCompanies = data.companies;
-
                     }
-
                     updateAdminCompanySelect();
-
                     filterData();
-
                 })
-
                 .catch(err => {
-
                     console.error("雲端讀取失敗:", err);
-
                     filterData();
-
                 })
-
                 .finally(() => {
-
                     if (syncIcon) syncIcon.classList.remove('animate-spin');
-
                 });
-
         }
-
-
 
         function updateAdminCompanySelect() {
-
             const select = document.getElementById('admin-company-select');
-
             if (!select) return;
-
             let html = `<option value="ALL">🌐 所有單位彙總 (Total Overview)</option>`;
-
             registeredCompanies.forEach(comp => {
-
                 html += `<option value="${comp.companyId}">🏢  ${comp.companyName}</option>`;
-
             });
-
             select.innerHTML = html;
-
         }
-
-
 
         function openModal(type, editId = null) {
-
             document.getElementById('form-id').value = '';
-
             document.getElementById('record-form').reset();
-
             document.getElementById('form-date').value = new Date().toISOString().split('T')[0];
-
             document.getElementById('photo-preview-container').classList.add('hidden');
-
             document.getElementById('ai-verify-badge').classList.add('hidden');
-
             compressedPhotoBase64 = '';
 
-
-
             if (editId) {
-
                 const item = database.find(i => String(i.id) === String(editId));
-
                 if (!item) return;
 
-
-
                 document.getElementById('modal-title').innerHTML = `<span>✏️</span> 編輯雲端數據`;
-
                 document.getElementById('form-id').value = item.id;
-
                 document.getElementById('form-type').value = item.type;
-
                 document.getElementById('form-date').value = item.date;
-
                 document.getElementById('form-dept').value = item.dept;
-
                 document.getElementById('form-author').value = item.author;
-
                 document.getElementById('form-notes').value = item.notes;
 
-
-
                 if (item.type === 'waste') {
-
                     document.getElementById('field-category-waste').classList.remove('hidden');
-
                     document.getElementById('field-amount-waste').classList.remove('hidden');
-
                     document.getElementById('field-bio-details').classList.add('hidden');
-
                     document.getElementById('form-category-waste').value = item.category;
-
                     document.getElementById('form-amount').value = item.amount;
-
                 } else {
-
                     document.getElementById('field-category-waste').classList.add('hidden');
-
                     document.getElementById('field-amount-waste').classList.add('hidden');
-
                     document.getElementById('field-bio-details').classList.remove('hidden');
-
                     document.getElementById('form-bio-title').value = item.category;
-
                     document.getElementById('form-worm-rating').value = item.rating;
-
                 }
-
             } else {
-
                 document.getElementById('modal-title').innerHTML = `<span>☁️</span> 填報雲端數據`;
-
                 document.getElementById('form-type').value = type;
-
                 if (type === 'waste') {
-
                     document.getElementById('field-category-waste').classList.remove('hidden');
-
                     document.getElementById('field-amount-waste').classList.remove('hidden');
-
                     document.getElementById('field-bio-details').classList.add('hidden');
-
                 } else {
-
                     document.getElementById('field-category-waste').classList.add('hidden');
-
                     document.getElementById('field-amount-waste').classList.add('hidden');
-
                     document.getElementById('field-bio-details').classList.remove('hidden');
-
                 }
-
             }
-
             document.getElementById('modal').classList.remove('hidden');
-
         }
-
-
 
         function closeModal() {
-
             document.getElementById('modal').classList.add('hidden');
-
         }
-
-
 
         function handleModalSubmit(e) {
-
             e.preventDefault();
-
             const editId = document.getElementById('form-id').value;
-
             const submitBtn = document.getElementById('submit-btn');
-
             submitBtn.disabled = true;
-
             submitBtn.innerHTML = `⏳ 正在同步至雲端...`;
 
-
-
             const type = document.getElementById('form-type').value;
-
             const isWaste = type === 'waste';
-
             const amount = parseFloat(document.getElementById('form-amount').value) || 0;
 
-
-
             const targetCompanyId = currentUser.role === 'ADMIN' ? 'CompanyA' : currentUser.companyId;
-
             const targetCompanyName = currentUser.role === 'ADMIN' ? '總管理處' : currentUser.companyName;
 
-
-
             const payload = {
-
                 action: editId ? "update" : "insert",
-
                 id: editId ? editId : Date.now(),
-
                 companyId: targetCompanyId,
-
                 companyName: targetCompanyName,
-
                 date: document.getElementById('form-date').value,
-
                 type: type,
-
                 category: isWaste ? document.getElementById('form-category-waste').value : (document.getElementById('form-bio-title').value || '生態觀察'),
-
                 amount: isWaste ? amount : 0,
-
                 rating: isWaste ? 0 : parseInt(document.getElementById('form-worm-rating').value),
-
                 carbon: isWaste ? (amount * 2.1).toFixed(1) : 0,
-
                 dept: document.getElementById('form-dept').value,
-
                 author: document.getElementById('form-author').value,
-
                 notes: document.getElementById('form-notes').value,
-
                 photoBase64: compressedPhotoBase64 || ''
-
             };
 
-
-
             fetch(GOOGLE_SCRIPT_URL, {
-
                 method: 'POST',
-
                 mode: 'no-cors',
-
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-
                 body: JSON.stringify(payload)
-
             })
-
             .then(() => {
-
                 alert(editId ? '🎉 編輯資料已成功更新至雲端！' : '🎉 資料已成功同步至 Google 雲端！');
-
                 closeModal();
-
                 setTimeout(loadCloudData, 1500);
-
             })
-
             .catch(err => {
-
                 console.error("雲端同步異常:", err);
-
                 alert('⚠️ 網路連線異常，請檢查網路。');
-
             })
-
             .finally(() => {
-
                 submitBtn.disabled = false;
-
                 submitBtn.innerHTML = `確認並同步雲端`;
-
             });
-
         }
-
-
 
         function deleteRecord(id) {
-
             if (!confirm("確定要刪除這筆永續紀錄嗎？")) return;
 
-
-
             const payload = {
-
                 action: "delete",
-
                 id: id
-
             };
 
-
-
             fetch(GOOGLE_SCRIPT_URL, {
-
                 method: 'POST',
-
                 mode: 'no-cors',
-
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-
                 body: JSON.stringify(payload)
-
             })
-
             .then(() => {
-
                 alert("🗑️ 資料已成功刪除！");
-
                 setTimeout(loadCloudData, 1200);
-
             })
-
             .catch(err => {
-
                 console.error("刪除失敗:", err);
-
                 alert("⚠️ 刪除失敗，請檢查網路連線。");
-
             });
-
         }
-
-
 
         function compressImage(event) {
-
             const file = event.target.files[0];
-
             if (!file) {
-
                 compressedPhotoBase64 = '';
-
                 document.getElementById('photo-preview-container').classList.add('hidden');
-
                 document.getElementById('ai-verify-badge').classList.add('hidden');
-
                 return;
-
             }
-
-
 
             const reader = new FileReader();
-
             reader.onload = function(e) {
-
                 const img = new Image();
-
                 img.onload = function() {
-
                     const canvas = document.createElement('canvas');
-
                     const MAX = 800;
-
                     let w = img.width, h = img.height;
-
                     if (w > h) { if (w > MAX) { h *= MAX / w; w = MAX; } }
-
                     else { if (h > MAX) { w *= MAX / h; h = MAX; } }
 
-
-
                     canvas.width = w; canvas.height = h;
-
                     const ctx = canvas.getContext('2d');
-
                     ctx.drawImage(img, 0, 0, w, h);
-
                     compressedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.6);
-
                     document.getElementById('photo-preview').src = compressedPhotoBase64;
-
                     document.getElementById('photo-preview-container').classList.remove('hidden');
 
-
-
                     runAiPhotoVerification();
-
                 };
-
                 img.src = e.target.result;
-
             };
-
             reader.readAsDataURL(file);
-
         }
-
-
 
         function runAiPhotoVerification() {
-
             if (!compressedPhotoBase64) return;
 
-
-
             const type = document.getElementById('form-type').value;
-
             const isWaste = type === 'waste';
-
             const category = isWaste 
-
                 ? document.getElementById('form-category-waste').value 
-
                 : (document.getElementById('form-bio-title').value || '生態觀察');
 
-
-
             const badge = document.getElementById('ai-verify-badge');
-
             if (!badge) return;
 
-
-
             badge.classList.remove('hidden');
-
             badge.className = "mt-2 p-2.5 text-xs rounded-xl bg-amber-50 border border-amber-200 text-amber-800 flex items-center gap-2";
-
             badge.innerHTML = `<span>⏳</span> AI 正在分析照片與「${category}」是否相符...`;
 
-
-
             const payload = {
-
                 action: "analyze_image",
-
                 photoBase64: compressedPhotoBase64,
-
                 expectedCategory: category,
-
                 type: type
-
             };
 
-
-
             fetch(GOOGLE_SCRIPT_URL, {
-
                 method: 'POST',
-
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-
                 body: JSON.stringify(payload)
-
             })
-
             .then(res => res.json())
-
             .then(res => {
-
                 if (res.status === "success") {
-
                     if (res.matched) {
-
                         badge.className = "mt-2 p-2.5 text-xs rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center gap-2";
-
                         badge.innerHTML = `<span>✅</span> <b>AI 辨識相符：</b>${res.detectedContent}（${res.reason}）`;
-
                     } else {
-
                         badge.className = "mt-2 p-2.5 text-xs rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-2";
-
                         badge.innerHTML = `<span>⚠️</span> <b>AI 警告：</b>畫面可能是「${res.detectedContent}」，與選擇的「${category}」可能不符合。`;
-
                     }
-
                 } else {
-
                     badge.className = "mt-2 p-2.5 text-xs rounded-xl bg-slate-50 text-slate-500";
-
                     badge.innerHTML = `ℹ️ AI 比對略過。`;
-
                 }
-
             })
-
             .catch(err => {
-
                 console.error("AI 比對連線失敗:", err);
-
                 badge.classList.add('hidden');
-
             });
-
         }
-
-
 
         function getAccessibleRecords() {
-
             if (!currentUser) return [];
-
             if (currentUser.role === 'ADMIN') {
-
                 const selected = document.getElementById('admin-company-select').value;
-
                 if (selected === 'ALL') return database;
-
                 return database.filter(i => i.companyId === selected);
-
             } else {
-
                 return database.filter(i => i.companyId === currentUser.companyId);
-
             }
-
         }
-
-
 
         function filterData() {
-
             const records = getAccessibleRecords();
-
             updateDashboard(records);
-
         }
 
-
-
         function updateDashboard(records) {
-
             const wasteRecords = records.filter(i => i.type === 'waste');
-
             const bioRecords = records.filter(i => i.type === 'bio');
 
-
-
             const totalWaste = wasteRecords.reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0);
-
             const carbonReduced = totalWaste * 2.1;
-
             const vermicompost = totalWaste * 0.3;
-
-
 
             const uniqueAuthors = new Set(records.map(i => i.author).filter(a => a && a.trim() !== ''));
 
-
-
             document.getElementById('kpi-total-waste').innerHTML = `${totalWaste.toFixed(1)} <span class="text-xs font-normal text-slate-500">kg</span>`;
-
             document.getElementById('kpi-carbon-reduced').innerHTML = `${carbonReduced.toFixed(1)} <span class="text-xs font-normal text-slate-500">kg CO₂e</span>`;
-
             document.getElementById('kpi-vermicompost').innerHTML = `${vermicompost.toFixed(1)} <span class="text-xs font-normal text-slate-500">kg</span>`;
-
             document.getElementById('kpi-total-people').innerHTML = `${uniqueAuthors.size} <span class="text-xs font-normal text-slate-500">人</span>`;
-
             document.getElementById('kpi-total-actions').innerHTML = `${records.length} <span class="text-xs font-normal text-slate-500">次行動</span>`;
 
-
-
             renderCharts(wasteRecords, bioRecords);
-
             renderTable(records);
-
         }
-
-
 
         function renderCharts(wasteRecords, bioRecords) {
-
             if (cWasteTrend) cWasteTrend.destroy();
-
             if (cWasteCat) cWasteCat.destroy();
-
             if (cBioTrend) cBioTrend.destroy();
-
             if (cBioCat) cBioCat.destroy();
 
-
-
             const wByDate = {};
-
             wasteRecords.forEach(i => wByDate[i.date] = (wByDate[i.date] || 0) + (parseFloat(i.amount) || 0));
-
             cWasteTrend = new Chart(document.getElementById('chart-waste-trend'), {
-
                 type: 'bar',
-
                 data: { labels: Object.keys(wByDate), datasets: [{ data: Object.values(wByDate), backgroundColor: '#10b981', borderRadius: 4 }] },
-
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-
             });
-
-
 
             const wCatMap = {};
-
             wasteRecords.forEach(i => wCatMap[i.category] = (wCatMap[i.category] || 0) + (parseFloat(i.amount) || 0));
-
             cWasteCat = new Chart(document.getElementById('chart-waste-category'), {
-
                 type: 'doughnut',
-
                 data: { labels: Object.keys(wCatMap), datasets: [{ data: Object.values(wCatMap), backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ec4899'] }] },
-
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 8 } } } }, cutout: '65%' }
-
             });
-
-
 
             const bByDate = {};
-
             bioRecords.forEach(i => bByDate[i.date] = (bByDate[i.date] || 0) + (parseInt(i.rating) || 0));
-
             cBioTrend = new Chart(document.getElementById('chart-bio-trend'), {
-
                 type: 'line',
-
                 data: { labels: Object.keys(bByDate), datasets: [{ data: Object.values(bByDate), borderColor: '#6366f1', fill: true, backgroundColor: 'rgba(99,102,241,0.1)', tension: 0.3 }] },
-
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-
             });
-
-
 
             const bCatMap = {};
-
             bioRecords.forEach(i => bCatMap[i.category] = (bCatMap[i.category] || 0) + 1);
-
             cBioCat = new Chart(document.getElementById('chart-bio-category'), {
-
                 type: 'doughnut',
-
                 data: { labels: Object.keys(bCatMap), datasets: [{ data: Object.values(bCatMap), backgroundColor: ['#6366f1', '#10b981', '#f59e0b'] }] },
-
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 8 } } } }, cutout: '65%' }
-
             });
-
         }
-
-
 
         function renderTable(records) {
-
             const search = document.getElementById('table-search').value.toLowerCase();
-
             const tbody = document.getElementById('data-table-body');
-
             tbody.innerHTML = '';
 
-
-
             const filtered = records.filter(i => 
-
                 (i.category && i.category.toLowerCase().includes(search)) ||
-
                 (i.dept && i.dept.toLowerCase().includes(search)) ||
-
                 (i.author && i.author.toLowerCase().includes(search))
-
             );
 
-
-
             filtered.slice().reverse().forEach(item => {
-
                 const tr = document.createElement('tr');
-
                 tr.className = "hover:bg-slate-50 transition";
-
                 const isWaste = item.type === 'waste';
-
                 const photoHtml = item.photo ? `<a href="${item.photo}" target="_blank" class="text-indigo-600 underline font-bold">🖼️ 檢視照片</a>` : `<span class="text-slate-300">無照片</span>`;
-
                 
-
                 let actionHtml = `<span class="text-slate-300 text-[11px]">唯讀</span>`;
-
                 if (currentUser && (currentUser.role === 'ADMIN' || currentUser.companyId === item.companyId)) {
-
                     actionHtml = `
-
                         <div class="flex items-center justify-center space-x-2">
-
                             <button onclick="openModal('${item.type}', '${item.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1 rounded-lg text-[11px] font-bold transition">編輯</button>
-
                             <button onclick="deleteRecord('${item.id}')" class="bg-rose-500 hover:bg-rose-600 text-white px-2.5 py-1 rounded-lg text-[11px] font-bold transition">刪除</button>
-
                         </div>
-
                     `;
-
                 }
 
-
-
                 tr.innerHTML = `
-
                     <td class="p-3.5 font-bold text-slate-800">${item.companyName || '-'}</td>
-
                     <td class="p-3.5">${photoHtml}</td>
-
                     <td class="p-3.5 text-slate-500">${item.date || '-'}</td>
-
                     <td class="p-3.5"><span class="px-2 py-0.5 text-[10px] font-bold rounded-full ${isWaste ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700'}">${isWaste ? '減碳' : '生態'}</span></td>
-
                     <td class="p-3.5 font-semibold">${item.category || '-'}</td>
-
                     <td class="p-3.5 font-bold text-slate-900">${isWaste ? (item.amount || 0) + ' kg' : '⭐ ' + (item.rating || 0) + ' 星'}</td>
-
                     <td class="p-3.5 text-teal-600 font-bold">${isWaste ? (item.carbon || 0) + ' kg' : '-'}</td>
-
                     <td class="p-3.5 text-slate-500">${item.dept || '-'}</td>
-
                     <td class="p-3.5 font-bold text-indigo-900 bg-indigo-50/50 rounded-lg">${item.author || '-'}</td>
-
                     <td class="p-3.5 text-slate-400 max-w-xs truncate">${item.notes || '-'}</td>
-
                     <td class="p-3.5 text-center">${actionHtml}</td>
-
                 `;
-
                 tbody.appendChild(tr);
-
             });
-
         }
-
-
 
         function exportCSV() {
-
             let csv = '\uFEFF組織代碼,組織名稱,日期,類型,細項類別,數量/評分,估算減碳,記錄單位,填寫人,備註,照片網址\n';
-
             getAccessibleRecords().forEach(item => {
-
                 csv += `"${item.companyId||''}","${item.companyName||''}","${item.date||''}","${item.type||''}","${item.category||''}","${item.amount || item.rating || 0}","${item.carbon||0}","${item.dept||''}","${item.author||''}","${(item.notes||'').replace(/"/g, '""')}","${item.photo||''}"\n`;
-
             });
-
             const link = document.createElement('a');
-
             link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
-
             link.download = `ESG_Impact_Report_${new Date().toISOString().split('T')[0]}.csv`;
-
             link.click();
-
         }
-
     </script>
-
 </body>
-
 </html>
