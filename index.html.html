@@ -396,7 +396,7 @@
             }
         }
 
-        // 處理註冊邏輯（成功後自動清空註冊欄位，並導向登入或直接進入）
+       // 處理註冊邏輯（成功後自動清空註冊欄位，並導向登入或直接進入）
         function handleRegister(e) {
             e.preventDefault();
             const btn = document.getElementById('reg-submit-btn');
@@ -429,8 +429,10 @@
                 } else if (res.status === "success") {
                     alert(`🎉 帳號申請成功！\n${companyName}\n帳號：${email}`);
                     
-                    // 註冊成功後，清空註冊表單欄位
-                    document.getElementById('register-form').reset();
+                    // 🔽 註冊成功後，立即清空註冊表單的所有輸入欄位
+                    document.getElementById('reg-company-name').value = '';
+                    document.getElementById('reg-email').value = '';
+                    document.getElementById('reg-password').value = '';
 
                     currentUser = { email: email, role: 'USER', companyId: companyId, companyName: companyName };
                     enterApp();
