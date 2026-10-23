@@ -278,8 +278,8 @@
                 </div>
 
                <div id="field-category-waste">
-                   <label class="block font-semibold text-slate-600 uppercase mb-1">廢棄物/資材種類 (AI 將自動辨識填入)</label>
-                   <input type="text" id="form-category-waste" placeholder="上傳照片後 AI 自動判定..." class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50">
+                   <label class="block font-semibold text-slate-600 uppercase mb-1">廢棄物/資材種類 (符合 GRI 306 規範)</label>
+                   <input type="text" id="form-category-waste" placeholder="例如：咖啡渣、茶葉渣、生廚餘、落葉與枯枝" required class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50">
                </div>
 
                 <div id="field-amount-waste">
@@ -316,8 +316,10 @@
                         <img id="photo-preview" src="" class="w-full h-full object-cover">
                     </div>
                     
-                    <!-- AI 比對結果顯示框 -->
-                    <div id="ai-verify-badge" class="hidden"></div>
+                    <!-- AI 隔離保留區狀態提示 -->
+                    <div id="ai-verify-badge" class="hidden mt-2 p-2.5 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-600 flex items-center gap-2">
+                        <span>🛡️</span> <b>照片已完成安全壓縮與預覽：</b>可直接同步至雲端供第三方稽核查驗。
+                    </div>
                 </div>
                
                 <div class="grid grid-cols-2 gap-3">
@@ -346,7 +348,7 @@
 
     <!-- Application JavaScript Logic -->
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbza24KOo1F87b2wU8axjkiDz7Prawt_2qCwmAhB2S52eWuQVRoc7gqwGA_Lc6eqanFq1Q/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxlW1_wTjT0R_PQ0AfwAy7PhinDfgY4J0mcFhxPq7FNZFMZjsfstnleyviOfRdsy73cmQ/exec";
 
         let database = [];
         let registeredCompanies = [];
@@ -354,11 +356,8 @@
         let compressedPhotoBase64 = '';
         let cWasteTrend = null, cWasteCat = null, cBioTrend = null, cBioCat = null;
 
-        // 網頁載入時：初始化日期、渲染歷史帳號選單與記住的憑證
         window.onload = function() {
             document.getElementById('form-date').value = new Date().toISOString().split('T')[0];
-            
-            // 渲染歷史輸入過的登入帳號下拉選單
             updateEmailDatalist();
 
             const savedEmail = localStorage.getItem('esg_saved_email');
@@ -368,24 +367,17 @@
                 document.getElementById('login-password').value = savedPassword;
                 document.getElementById('remember-me').checked = true;
             }
-            // 設定每 60 秒自動在背景同步一次雲端資料
             setInterval(function() {
-                if (currentUser) {
-                    loadCloudData();
-                }
+                if (currentUser) loadCloudData();
             }, 60000);
         };
 
-        // 更新歷史帳號下拉選單
         function updateEmailDatalist() {
             const datalist = document.getElementById('saved-emails');
             if (!datalist) return;
-            
             const historyEmails = JSON.parse(localStorage.getItem('esg_email_history') || '[]');
             let html = '';
-            historyEmails.forEach(email => {
-                html += `<option value="${email}">`;
-            });
+            historyEmails.forEach(email => { html += `<option value="${email}">`; });
             datalist.innerHTML = html;
         }
 
@@ -408,7 +400,6 @@
             }
         }
 
-        // 處理註冊邏輯（送出時立即清空欄位）
         function handleRegister(e) {
             e.preventDefault();
             const btn = document.getElementById('reg-submit-btn');
@@ -420,7 +411,6 @@
             const password = document.getElementById('reg-password').value.trim();
             const companyId = "Comp_" + Date.now();
 
-            // 🔽 點擊送出後立刻清空註冊輸入框
             document.getElementById('register-form').reset();
 
             const payload = {
@@ -459,7 +449,6 @@
             });
         }
 
-        // 處理「記住我」勾選框切換事件
         function handleRememberMeChange() {
             const checkbox = document.getElementById('remember-me');
             const emailInput = document.getElementById('login-email');
@@ -478,14 +467,12 @@
             }
         }
 
-        // 處理登入邏輯（更新歷史紀錄並處理「記住我」）
         function handleLogin(e) {
             e.preventDefault();
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value.trim();
             const rememberChecked = document.getElementById('remember-me').checked;
 
-            // 儲存至歷史帳號清單 (最多保留 5 筆)
             if (email) {
                 let historyEmails = JSON.parse(localStorage.getItem('esg_email_history') || '[]');
                 if (!historyEmails.includes(email)) {
@@ -500,7 +487,6 @@
                 localStorage.setItem('esg_saved_email', email);
                 localStorage.setItem('esg_saved_password', password);
             } else {
-                // 如果未勾選記住我，強制清除快取與輸入框
                 localStorage.removeItem('esg_saved_email');
                 localStorage.removeItem('esg_saved_password');
                 document.getElementById('login-email').value = '';
@@ -577,8 +563,6 @@
             currentUser = null;
             document.getElementById('app-screen').classList.add('hidden');
             document.getElementById('auth-screen').classList.remove('hidden');
-            
-            // 登出時如果沒勾選記住我，清空欄位
             if (!document.getElementById('remember-me').checked) {
                 document.getElementById('login-email').value = '';
                 document.getElementById('login-password').value = '';
@@ -592,12 +576,8 @@
             fetch(GOOGLE_SCRIPT_URL)
                 .then(res => res.json())
                 .then(data => {
-                    if (data && Array.isArray(data.records)) {
-                        database = data.records;
-                    }
-                    if (data && Array.isArray(data.companies)) {
-                        registeredCompanies = data.companies;
-                    }
+                    if (data && Array.isArray(data.records)) database = data.records;
+                    if (data && Array.isArray(data.companies)) registeredCompanies = data.companies;
                     updateAdminCompanySelect();
                     filterData();
                 })
@@ -728,10 +708,7 @@
         function deleteRecord(id) {
             if (!confirm("確定要刪除這筆永續紀錄嗎？")) return;
 
-            const payload = {
-                action: "delete",
-                id: id
-            };
+            const payload = { action: "delete", id: id };
 
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
@@ -775,61 +752,14 @@
                     document.getElementById('photo-preview').src = compressedPhotoBase64;
                     document.getElementById('photo-preview-container').classList.remove('hidden');
 
-                    runAiPhotoVerification();
+                    // 🛡️ AI 隔離區：改為顯示預覽就緒提示
+                    const badge = document.getElementById('ai-verify-badge');
+                    if (badge) badge.classList.remove('hidden');
                 };
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
-
-        // 🤖 發送 AI 照片比對請求並自動填入種類
-function runAiPhotoVerification() {
-    const type = document.getElementById('form-type').value;
-    const isWaste = type === 'waste';
-    
-    // 如果是新增時還沒選類別，可以先給 AI 一個預判提示
-    const categoryInput = isWaste ? document.getElementById('form-category-waste') : document.getElementById('form-bio-title');
-    const currentCategory = categoryInput.value || (isWaste ? '有機廢棄物' : '生態觀察');
-
-    const badge = document.getElementById('ai-verify-badge');
-    if (!badge) return;
-
-    badge.classList.remove('hidden');
-    badge.className = "mt-2 p-2.5 text-xs rounded-xl bg-amber-50 border border-amber-200 text-amber-800 flex items-center gap-2";
-    badge.innerHTML = `<span>⏳</span> AI 正在分析照片並自動辨識資材種類...`;
-
-    const payload = {
-        action: "analyze_image",
-        photoBase64: compressedPhotoBase64,
-        expectedCategory: currentCategory,
-        type: type
-    };
-
-    fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-    })
-    .then(res => res.json())
-    .then(res => {
-        if (res.status === "success") {
-            // 💡 核心新邏輯：直接將 AI 辨識出的項目自動填入對應欄位！
-            if (res.detectedContent && res.detectedContent !== "無法辨識") {
-                categoryInput.value = res.detectedContent;
-            }
-
-            badge.className = "mt-2 p-2.5 text-xs rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center gap-2";
-            badge.innerHTML = `<span>✅</span> <b>AI 自動辨識成功：</b>已自動填入「${res.detectedContent}」（${res.reason}）`;
-        } else {
-            badge.className = "mt-2 p-2.5 text-xs rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-2";
-            badge.innerHTML = `<span>⚠️</span> <b>AI 警告：</b>無法自動辨識，請手動填寫資材種類。`;
-        }
-    })
-    .catch(err => {
-        console.error("AI 比對連線失敗:", err);
-        badge.classList.add('hidden');
-    });
-}
 
         function getAccessibleRecords() {
             if (!currentUser) return [];
