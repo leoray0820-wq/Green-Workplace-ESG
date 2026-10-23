@@ -277,9 +277,16 @@
                     <input type="date" id="form-date" required class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
 
-               <div id="field-category-waste">
-                   <label class="block font-semibold text-slate-600 uppercase mb-1">廢棄物/資材種類 (符合 GRI 306 規範)</label>
-                   <input type="text" id="form-category-waste" placeholder="例如：咖啡渣、茶葉渣、生廚餘、落葉與枯枝" required class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50">
+              <div id="field-category-waste">
+                   <label class="block font-semibold text-slate-600 uppercase mb-1">廢棄物/資材種類 (GRI 306 合規清單)</label>
+                   <select id="form-category-waste" required class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-medium text-slate-700">
+                       <option value="" disabled selected>-- 請選擇合規減碳資材種類 --</option>
+                       <option value="咖啡渣 (GRI 306-2 循環再利用)">☕ 咖啡渣 (GRI 306-2 循環再利用)</option>
+                       <option value="茶葉渣 (GRI 306-2 循環再利用)">🍵 茶葉渣 (GRI 306-2 循環再利用)</option>
+                       <option value="果皮生廚餘 (GRI 306-2 有機堆肥)">🍎 果皮生廚餘 (GRI 306-2 有機堆肥)</option>
+                       <option value="園藝枯枝落葉 (TNFD 碳匯與生物多樣性)">🍃 園藝枯枝落葉 (TNFD 碳匯與生物多樣性)</option>
+                       <option value="其他可堆肥有機資材">🌱 其他可堆肥有機資材</option>
+                   </select>
                </div>
 
                 <div id="field-amount-waste">
