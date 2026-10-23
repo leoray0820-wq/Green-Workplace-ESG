@@ -396,59 +396,56 @@
             }
         }
 
-       // 處理註冊邏輯（成功後自動清空註冊欄位，並導向登入或直接進入）
-        function handleRegister(e) {
-            e.preventDefault();
-            const btn = document.getElementById('reg-submit-btn');
-            btn.disabled = true;
-            btn.innerHTML = "⏳ 正在驗證與註冊...";
+       // 處理註冊邏輯（送出時立即清空欄位）
+function handleRegister(e) {
+    e.preventDefault();
+    const btn = document.getElementById('reg-submit-btn');
+    btn.disabled = true;
+    btn.innerHTML = "⏳ 正在驗證與註冊...";
 
-            const companyName = document.getElementById('reg-company-name').value.trim();
-            const email = document.getElementById('reg-email').value.trim();
-            const password = document.getElementById('reg-password').value.trim();
-            const companyId = "Comp_" + Date.now();
+    const companyName = document.getElementById('reg-company-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const password = document.getElementById('reg-password').value.trim();
+    const companyId = "Comp_" + Date.now();
 
-            const payload = {
-                action: "register",
-                companyName: companyName,
-                email: email,
-                password: password,
-                companyId: companyId
-            };
+    // 🔽 點擊送出後立刻清空註冊輸入框
+    document.getElementById('register-form').reset();
 
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(payload)
-            })
-            .then(res => res.json())
-            .then(res => {
-                if (res.status === "duplicate") {
-                    alert("⚠️ " + res.message);
-                    switchAuthTab('login');
-                } else if (res.status === "success") {
-                    alert(`🎉 帳號申請成功！\n${companyName}\n帳號：${email}`);
-                    
-                    // 🔽 註冊成功後，立即清空註冊表單的所有輸入欄位
-                    document.getElementById('reg-company-name').value = '';
-                    document.getElementById('reg-email').value = '';
-                    document.getElementById('reg-password').value = '';
+    const payload = {
+        action: "register",
+        companyName: companyName,
+        email: email,
+        password: password,
+        companyId: companyId
+    };
 
-                    currentUser = { email: email, role: 'USER', companyId: companyId, companyName: companyName };
-                    enterApp();
-                } else {
-                    alert("註冊發生錯誤：" + (res.message || "未知原因"));
-                }
-            })
-            .catch(err => {
-                console.error("註冊失敗:", err);
-                alert("⚠️ 網路連線異常，請檢查網路狀態。");
-            })
-            .finally(() => {
-                btn.disabled = false;
-                btn.innerHTML = "📝 送出帳號申請";
-            });
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res.status === "duplicate") {
+            alert("⚠️ " + res.message);
+            switchAuthTab('login');
+        } else if (res.status === "success") {
+            alert(`🎉 帳號申請成功！\n${companyName}\n帳號：${email}`);
+            currentUser = { email: email, role: 'USER', companyId: companyId, companyName: companyName };
+            enterApp();
+        } else {
+            alert("註冊發生錯誤：" + (res.message || "未知原因"));
         }
+    })
+    .catch(err => {
+        console.error("註冊失敗:", err);
+        alert("⚠️ 網路連線異常，請檢查網路狀態。");
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = "📝 送出帳號申請";
+    });
+}
 
         // 處理「記住我」勾選框切換事件
         function handleRememberMeChange() {
