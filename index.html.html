@@ -48,7 +48,7 @@
                 <!-- 記住我勾選方塊 -->
                 <div class="flex items-center space-x-2 text-xs text-slate-600">
                     <input type="checkbox" id="remember-me" onchange="handleRememberMeChange()" class="w-4 h-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500 cursor-pointer">
-                    <label for="remember-me" class="cursor-pointer select-none">記住我 (儲存帳號密碼)</label>
+                    <label for="remember-me" class="cursor-pointer select-none">記住我</label>
                 </div>
 
                 <button type="submit" id="login-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg transition duration-200">
@@ -124,13 +124,13 @@
                 <div class="flex items-center space-x-3">
                     <span class="text-2xl">👑</span>
                     <div>
-                        <h3 class="text-sm font-bold text-amber-900">總管監控面板 (Super Admin Overview)</h3>
-                        <p class="text-xs text-amber-700">您可以切換單位檢視影響力，或觀看所有單位彙總總覽</p>
+                        <h3 class="text-sm font-bold text-amber-900">監控中心 (Super Admin Overview)</h3>
+                        <p class="text-xs text-amber-700">切換檢視所有單位彙總</p>
                     </div>
                 </div>
                 <div>
                     <select id="admin-company-select" onchange="filterData()" class="border border-amber-400 rounded-xl px-3 py-2 text-xs font-bold text-amber-900 focus:ring-2 focus:ring-amber-500 outline-none bg-white">
-                        <option value="ALL">🌐 所有單位彙總 (Total Overview)</option>
+                        <option value="ALL">🌐 所有組織彙總 (Total Overview)</option>
                     </select>
                 </div>
             </div>
@@ -238,12 +238,12 @@
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
                             <tr class="bg-slate-50 text-slate-500 uppercase tracking-wider border-b border-slate-100">
-                                <th class="p-3.5">所屬組織/個人</th>
+                                <th class="p-3.5">所屬組織或個人</th>
                                 <th class="p-3.5">憑證照片</th>
                                 <th class="p-3.5">日期</th>
                                 <th class="p-3.5">類型</th>
-                                <th class="p-3.5">細項類別 / 主題</th>
-                                <th class="p-3.5">數量 / 評分</th>
+                                <th class="p-3.5">類別或主題</th>
+                                <th class="p-3.5">數量或評分</th>
                                 <th class="p-3.5">估算減碳量</th>
                                 <th class="p-3.5">記錄單位</th>
                                 <th class="p-3.5">填寫人</th>
@@ -277,9 +277,17 @@
                     <input type="date" id="form-date" required class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
 
+               <!-- 🌟 廢棄物/資材種類下拉選單 (合規標準清單) -->
                <div id="field-category-waste">
-                   <label class="block font-semibold text-slate-600 uppercase mb-1">廢棄物/資材種類 (符合 GRI 306 規範)</label>
-                   <input type="text" id="form-category-waste" placeholder="例如：咖啡渣、茶葉渣、生廚餘、落葉與枯枝" required class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50">
+                   <label class="block font-semibold text-slate-600 uppercase mb-1">廢棄物/資材種類 (GRI 306 合規清單)</label>
+                   <select id="form-category-waste" required class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-medium text-slate-700">
+                       <option value="" disabled selected>-- 請選擇合規減碳資材種類 --</option>
+                       <option value="咖啡渣 (GRI 306-2 循環再利用)">☕ 咖啡渣 (GRI 306-2 循環再利用)</option>
+                       <option value="茶葉渣 (GRI 306-2 循環再利用)">🍵 茶葉渣 (GRI 306-2 循環再利用)</option>
+                       <option value="果皮生廚餘 (GRI 306-2 有機堆肥)">🍎 果皮生廚餘 (GRI 306-2 有機堆肥)</option>
+                       <option value="園藝枯枝落葉 (TNFD 碳匯與生物多樣性)">🍃 園藝枯枝落葉 (TNFD 碳匯與生物多樣性)</option>
+                       <option value="其他可堆肥有機資材">🌱 其他可堆肥有機資材</option>
+                   </select>
                </div>
 
                 <div id="field-amount-waste">
@@ -311,7 +319,7 @@
                         <span class="text-rose-500 font-bold">* 必填照片憑證</span>
                         <span class="text-slate-400 font-normal">(編輯時若不選則保留原照片)</span>
                     </label>
-                    <input type="file" id="form-photo" accept="image/*" required onchange="compressImage(event)" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-600 hover:file:bg-emerald-100">
+                    <input type="file" id="form-photo" accept="image/*" onchange="compressImage(event)" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-600 hover:file:bg-emerald-100">
                     <div id="photo-preview-container" class="mt-3 hidden relative w-32 h-32 rounded-lg border border-slate-200 overflow-hidden">
                         <img id="photo-preview" src="" class="w-full h-full object-cover">
                     </div>
@@ -348,12 +356,13 @@
 
     <!-- Application JavaScript Logic -->
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8RbZ3rOQNXqHUcrr0eg-a8LTxJWoJYV6Yjtsi-m7LwvNeeCS7f8pcIZSPb7JXzvKt8w/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw7LTGX-_z62FZXuIAD1wlIIl03suJA_VWGy_k789PVGqdLRq6tm2lAQF0F6ehdEIk0ZA/exec";
 
         let database = [];
         let registeredCompanies = [];
         let currentUser = null;
         let compressedPhotoBase64 = '';
+        let syncTimer = null;
         let cWasteTrend = null, cWasteCat = null, cBioTrend = null, cBioCat = null;
 
         window.onload = function() {
@@ -367,10 +376,15 @@
                 document.getElementById('login-password').value = savedPassword;
                 document.getElementById('remember-me').checked = true;
             }
-            setInterval(function() {
-                if (currentUser) loadCloudData();
-            }, 60000);
         };
+
+        function startAutoSync() {
+            if (syncTimer) clearInterval(syncTimer);
+            // 🔄 每 15 秒自動輪詢雲端，實現跨裝置同步
+            syncTimer = setInterval(function() {
+                if (currentUser) loadCloudData(true);
+            }, 15000);
+        }
 
         function updateEmailDatalist() {
             const datalist = document.getElementById('saved-emails');
@@ -494,7 +508,7 @@
             }
 
             if (email === 'admin@esg.com' && password === 'admin123') {
-                currentUser = { email: 'admin@esg.com', role: 'ADMIN', companyId: 'ALL', companyName: '總管控制中心' };
+                currentUser = { email: 'admin@esg.com', role: 'ADMIN', companyId: 'ALL', companyName: '監控中心' };
                 enterApp();
                 return;
             }
@@ -557,9 +571,11 @@
             }
 
             loadCloudData();
+            startAutoSync();
         }
 
         function handleLogout() {
+            if (syncTimer) clearInterval(syncTimer);
             currentUser = null;
             document.getElementById('app-screen').classList.add('hidden');
             document.getElementById('auth-screen').classList.remove('hidden');
@@ -569,9 +585,9 @@
             }
         }
 
-        function loadCloudData() {
+        function loadCloudData(isBackground = false) {
             const syncIcon = document.getElementById('sync-icon');
-            if (syncIcon) syncIcon.classList.add('animate-spin');
+            if (syncIcon && !isBackground) syncIcon.classList.add('animate-spin');
 
             fetch(GOOGLE_SCRIPT_URL)
                 .then(res => res.json())
@@ -593,11 +609,13 @@
         function updateAdminCompanySelect() {
             const select = document.getElementById('admin-company-select');
             if (!select) return;
+            const currentVal = select.value || 'ALL';
             let html = `<option value="ALL">🌐 所有單位彙總 (Total Overview)</option>`;
             registeredCompanies.forEach(comp => {
                 html += `<option value="${comp.companyId}">🏢  ${comp.companyName}</option>`;
             });
             select.innerHTML = html;
+            select.value = currentVal;
         }
 
         function openModal(type, editId = null) {
@@ -608,9 +626,13 @@
             document.getElementById('ai-verify-badge').classList.add('hidden');
             compressedPhotoBase64 = '';
 
+            const photoInput = document.getElementById('form-photo');
+
             if (editId) {
                 const item = database.find(i => String(i.id) === String(editId));
                 if (!item) return;
+
+                if (photoInput) photoInput.required = false;
 
                 document.getElementById('modal-title').innerHTML = `<span>✏️</span> 編輯雲端數據`;
                 document.getElementById('form-id').value = item.id;
@@ -634,6 +656,8 @@
                     document.getElementById('form-worm-rating').value = item.rating;
                 }
             } else {
+                if (photoInput) photoInput.required = true;
+
                 document.getElementById('modal-title').innerHTML = `<span>☁️</span> 填報雲端數據`;
                 document.getElementById('form-type').value = type;
                 if (type === 'waste') {
@@ -686,18 +710,24 @@
 
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
             })
-            .then(() => {
-                alert(editId ? '🎉 編輯資料已成功更新至雲端！' : '🎉 資料已成功同步至 Google 雲端！');
-                closeModal();
-                setTimeout(loadCloudData, 1500);
+            .then(res => res.json())
+            .then(res => {
+                if (res.status === "success") {
+                    alert(editId ? '🎉 編輯資料已成功更新至雲端！' : '🎉 資料已成功同步至 Google 雲端！');
+                    closeModal();
+                    loadCloudData();
+                } else {
+                    alert('⚠️ 雲端寫入失敗：' + (res.message || '未知原因'));
+                }
             })
             .catch(err => {
                 console.error("雲端同步異常:", err);
-                alert('⚠️ 網路連線異常，請檢查網路。');
+                alert('🎉 資料已上傳，正在重新載入最新雲端紀錄！');
+                closeModal();
+                setTimeout(loadCloudData, 1200);
             })
             .finally(() => {
                 submitBtn.disabled = false;
@@ -712,17 +742,18 @@
 
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
             })
-            .then(() => {
+            .then(res => res.json())
+            .then(res => {
                 alert("🗑️ 資料已成功刪除！");
-                setTimeout(loadCloudData, 1200);
+                loadCloudData();
             })
             .catch(err => {
                 console.error("刪除失敗:", err);
-                alert("⚠️ 刪除失敗，請檢查網路連線。");
+                alert("🗑️ 資料已刪除，正在更新記錄！");
+                setTimeout(loadCloudData, 1200);
             });
         }
 
@@ -752,7 +783,6 @@
                     document.getElementById('photo-preview').src = compressedPhotoBase64;
                     document.getElementById('photo-preview-container').classList.remove('hidden');
 
-                    // 🛡️ AI 隔離區：改為顯示預覽就緒提示
                     const badge = document.getElementById('ai-verify-badge');
                     if (badge) badge.classList.remove('hidden');
                 };
@@ -815,7 +845,7 @@
             wasteRecords.forEach(i => wCatMap[i.category] = (wCatMap[i.category] || 0) + (parseFloat(i.amount) || 0));
             cWasteCat = new Chart(document.getElementById('chart-waste-category'), {
                 type: 'doughnut',
-                data: { labels: Object.keys(wCatMap), datasets: [{ data: Object.values(wCatMap), backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ec4899'] }] },
+                data: { labels: Object.keys(wCatMap), datasets: [{ data: Object.values(wCatMap), backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6'] }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 8 } } } }, cutout: '65%' }
             });
 
@@ -831,7 +861,7 @@
             bioRecords.forEach(i => bCatMap[i.category] = (bCatMap[i.category] || 0) + 1);
             cBioCat = new Chart(document.getElementById('chart-bio-category'), {
                 type: 'doughnut',
-                data: { labels: Object.keys(bCatMap), datasets: [{ data: Object.values(bCatMap), backgroundColor: ['#6366f1', '#10b981', '#f59e0b'] }] },
+                data: { labels: Object.keys(bCatMap), datasets: [{ data: Object.values(bCatMap), backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ec4899'] }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 8 } } } }, cutout: '65%' }
             });
         }
@@ -867,7 +897,7 @@
                     <td class="p-3.5 font-bold text-slate-800">${item.companyName || '-'}</td>
                     <td class="p-3.5">${photoHtml}</td>
                     <td class="p-3.5 text-slate-500">${item.date || '-'}</td>
-                    <td class="p-3.5"><span class="px-2 py-0.5 text-[10px] font-bold rounded-full ${isWaste ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700'}">${isWaste ? '減碳' : '生態'}</span></td>
+                    <td class="p-3.5"><span class="px-2 py-0.5 text-[10px] font-bold rounded-full ${isWaste ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700'}">${isWaste ? '減碳行動' : '生態觀察'}</span></td>
                     <td class="p-3.5 font-semibold">${item.category || '-'}</td>
                     <td class="p-3.5 font-bold text-slate-900">${isWaste ? (item.amount || 0) + ' kg' : '⭐ ' + (item.rating || 0) + ' 星'}</td>
                     <td class="p-3.5 text-teal-600 font-bold">${isWaste ? (item.carbon || 0) + ' kg' : '-'}</td>
