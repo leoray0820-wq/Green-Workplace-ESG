@@ -366,11 +366,7 @@
 
         window.onload = function() {
     document.getElementById('form-date').value = new Date().toISOString().split('T')[0];
-    // 檢查是否有儲存過的帳號
-    const savedEmail = localStorage.getItem('saved_email');
-    if (savedEmail) {
-        document.getElementById('login-email').value = savedEmail;
-        document.getElementById('remember-me').checked = true;
+   
     // 設定每 60 秒自動在背景同步一次雲端資料
     setInterval(function() {
         if (currentUser) {
