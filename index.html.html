@@ -446,62 +446,55 @@
         }
 
        function handleLogin(e) {
-    e.preventDefault();
-    const email = document.getElementById('login-email').value.trim();
-    const password = document.getElementById('login-password').value.trim();
-    const rememberMe = document.getElementById('remember-me').checked;
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value.trim();
 
-    // 處理「記住我」的狀態儲存
-    if (rememberMe) {
-        localStorage.setItem('saved_email', email);
-    } else {
-        localStorage.removeItem('saved_email');
-    }
+            if (email === 'admin@esg.com' && password === 'admin123') {
+                currentUser = { email: 'admin@esg.com', role: 'ADMIN', companyId: 'ALL', companyName: '總管控制中心' };
+                enterApp();
+                return;
+            }
 
-    if (email === 'admin@esg.com' && password === 'admin123') {
-        currentUser = { email: 'admin@esg.com', role: 'ADMIN', companyId: 'ALL', companyName: '總管控制中心' };
-        enterApp();
-        return;
-    }
+            const btn = document.getElementById('login-btn');
+            btn.disabled = true;
+            btn.innerHTML = "⏳ 驗證中...";
 
-    const btn = document.getElementById('login-btn');
-    btn.disabled = true;
-    btn.innerHTML = "⏳ 驗證中...";
-
-    const payload = {
-        action: "login",
-        email: email,
-        password: password
-    };
-
-    fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-    })
-    .then(res => res.json())
-    .then(res => {
-        if (res.status === "success") {
-            currentUser = {
-                email: res.email,
-                role: 'USER',
-                companyId: res.companyId,
-                companyName: res.companyName
+            const payload = {
+                action: "login",
+                email: email,
+                password: password
             };
-            enterApp();
-        } else {
-            alert('⚠️ 登入失敗：帳號或密碼錯誤。');
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.status === "success") {
+                    currentUser = {
+                        email: res.email,
+                        role: 'USER',
+                        companyId: res.companyId,
+                        companyName: res.companyName
+                    };
+                    enterApp();
+                } else {
+                    alert('⚠️ 登入失敗：帳號或密碼錯誤。');
+                }
+            })
+            .catch(err => {
+                console.error("登入連線失敗:", err);
+                alert('⚠️ 雲端連線異常，請檢查網路。');
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = "🔑 驗證登入";
+            });
         }
-    })
-    .catch(err => {
-        console.error("登入連線失敗:", err);
-        alert('⚠️ 雲端連線異常，請檢查網路。');
-    })
-    .finally(() => {
-        btn.disabled = false;
-        btn.innerHTML = "🔑 驗證登入";
-    });
-}
+
 
         function enterApp() {
             document.getElementById('auth-screen').classList.add('hidden');
