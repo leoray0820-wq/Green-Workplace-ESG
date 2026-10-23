@@ -33,7 +33,7 @@
                 <button id="tab-register-btn" onclick="switchAuthTab('register')" class="w-1/2 py-2 border-b-2 border-transparent text-slate-400 hover:text-slate-600">申請註冊</button>
             </div>
 
-           <!-- 登入表單 -->
+          <!-- 登入表單 -->
 <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
     <div>
         <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">帳號 (Email)</label>
@@ -43,13 +43,11 @@
         <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">密碼</label>
         <input type="password" id="login-password" value="" required placeholder="••••••••" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-slate-50">
     </div>
-    
-    <!-- 👇 新增「記住我」勾選方塊 -->
-    <div class="flex items-center justify-between text-xs">
-        <label class="flex items-center space-x-2 cursor-pointer text-slate-600">
-            <input type="checkbox" id="remember-me" class="w-4 h-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500">
-            <span>記住我的帳號</span>
-        </label>
+
+    <!-- 🔽 新增：記住我勾選方塊 -->
+    <div class="flex items-center space-x-2 text-xs text-slate-600">
+        <input type="checkbox" id="remember-me" onchange="handleRememberMeChange()" class="w-4 h-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500 cursor-pointer">
+        <label for="remember-me" class="cursor-pointer select-none">記住我 (儲存帳號密碼)</label>
     </div>
 
     <button type="submit" id="login-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg transition duration-200">
@@ -364,16 +362,23 @@
         let compressedPhotoBase64 = '';
         let cWasteTrend = null, cWasteCat = null, cBioTrend = null, cBioCat = null;
 
+        // 網頁載入時：檢查是否有先前記住的帳號密碼
         window.onload = function() {
-    document.getElementById('form-date').value = new Date().toISOString().split('T')[0];
-   
-    // 設定每 60 秒自動在背景同步一次雲端資料
-    setInterval(function() {
-        if (currentUser) {
-            loadCloudData();
-        }
-    }, 60000);
-};
+            document.getElementById('form-date').value = new Date().toISOString().split('T')[0];
+            const savedEmail = localStorage.getItem('esg_saved_email');
+            const savedPassword = localStorage.getItem('esg_saved_password');
+            if (savedEmail && savedPassword) {
+                document.getElementById('login-email').value = savedEmail;
+                document.getElementById('login-password').value = savedPassword;
+                document.getElementById('remember-me').checked = true;
+            }
+            // 設定每 60 秒自動在背景同步一次雲端資料
+            setInterval(function() {
+                if (currentUser) {
+                    loadCloudData();
+                }
+            }, 60000);
+        };
 
         function switchAuthTab(tab) {
             const loginForm = document.getElementById('login-form');
@@ -441,57 +446,85 @@
             });
         }
 
-       function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value.trim();
+        // 處理「記住我」勾選框切換事件
+function handleRememberMeChange() {
+    const checkbox = document.getElementById('remember-me');
+    const emailInput = document.getElementById('login-email');
+    const passwordInput = document.getElementById('login-password');
 
-            if (email === 'admin@esg.com' && password === 'admin123') {
-                currentUser = { email: 'admin@esg.com', role: 'ADMIN', companyId: 'ALL', companyName: '總管控制中心' };
-                enterApp();
-                return;
-            }
-
-            const btn = document.getElementById('login-btn');
-            btn.disabled = true;
-            btn.innerHTML = "⏳ 驗證中...";
-
-            const payload = {
-                action: "login",
-                email: email,
-                password: password
-            };
-
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(payload)
-            })
-            .then(res => res.json())
-            .then(res => {
-                if (res.status === "success") {
-                    currentUser = {
-                        email: res.email,
-                        role: 'USER',
-                        companyId: res.companyId,
-                        companyName: res.companyName
-                    };
-                    enterApp();
-                } else {
-                    alert('⚠️ 登入失敗：帳號或密碼錯誤。');
-                }
-            })
-            .catch(err => {
-                console.error("登入連線失敗:", err);
-                alert('⚠️ 雲端連線異常，請檢查網路。');
-            })
-            .finally(() => {
-                btn.disabled = false;
-                btn.innerHTML = "🔑 驗證登入";
-            });
+    if (checkbox.checked) {
+        // 如果勾選，且欄位有值，立即儲存
+        if (emailInput.value.trim() && passwordInput.value.trim()) {
+            localStorage.setItem('esg_saved_email', emailInput.value.trim());
+            localStorage.setItem('esg_saved_password', passwordInput.value.trim());
         }
+    } else {
+        // 如果取消勾選，立刻清空本機儲存與輸入框
+        localStorage.removeItem('esg_saved_email');
+        localStorage.removeItem('esg_saved_password');
+        emailInput.value = '';
+        passwordInput.value = '';
+    }
+}
 
+function handleLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value.trim();
+    const rememberChecked = document.getElementById('remember-me').checked;
 
+    // 如果使用者有勾選「記住我」，在點擊登入時同步儲存最新輸入的帳號密碼
+    if (rememberChecked) {
+        localStorage.setItem('esg_saved_email', email);
+        localStorage.setItem('esg_saved_password', password);
+    }
+
+    if (email === 'admin@esg.com' && password === 'admin123') {
+        currentUser = { email: 'admin@esg.com', role: 'ADMIN', companyId: 'ALL', companyName: '總管控制中心' };
+        enterApp();
+        return;
+    }
+
+    const btn = document.getElementById('login-btn');
+    btn.disabled = true;
+    btn.innerHTML = "⏳ 驗證中...";
+
+    const payload = {
+        action: "login",
+        email: email,
+        password: password
+    };
+
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res.status === "success") {
+            currentUser = {
+                email: res.email,
+                role: 'USER',
+                companyId: res.companyId,
+                companyName: res.companyName
+            };
+            enterApp();
+        } else {
+            alert('⚠️ 登入失敗：帳號或密碼錯誤。');
+        }
+    })
+    .catch(err => {
+        console.error("登入連線失敗:", err);
+        alert('⚠️ 雲端連線異常，請檢查網路。');
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = "🔑 驗證登入";
+    });
+}
+
+       
         function enterApp() {
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('app-screen').classList.remove('hidden');
