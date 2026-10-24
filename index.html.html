@@ -272,7 +272,7 @@
             <!-- 🌟 視窗內部的填報類型 Tab 切換按鈕 -->
             <div id="action-type-tabs" class="flex border-b border-slate-200 bg-slate-50 text-xs font-bold">
                 <button id="tab-waste-btn" type="button" onclick="switchFormType('waste')" class="w-1/2 py-3 border-b-2 border-emerald-500 text-emerald-600 flex items-center justify-center gap-1.5 transition">
-                    <span>💨</span> 減碳行動
+                    <span>💨</span> 減碳環保
                 </button>
                 <button id="tab-bio-btn" type="button" onclick="switchFormType('bio')" class="w-1/2 py-3 border-b-2 border-transparent text-slate-400 hover:text-slate-600 flex items-center justify-center gap-1.5 transition">
                     <span>🔍</span> 生態觀察
@@ -922,7 +922,7 @@
                     <td class="p-3.5 font-bold text-slate-800">${item.companyName || '-'}</td>
                     <td class="p-3.5">${photoHtml}</td>
                     <td class="p-3.5 text-slate-500">${item.date || '-'}</td>
-                    <td class="p-3.5"><span class="px-2 py-0.5 text-[10px] font-bold rounded-full ${isWaste ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700'}">${isWaste ? '減碳行動' : '生態觀察'}</span></td>
+                    <td class="p-3.5"><span class="px-2 py-0.5 text-[10px] font-bold rounded-full ${isWaste ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700'}">${isWaste ? '減碳環保' : '生態觀察'}</span></td>
                     <td class="p-3.5 font-semibold">${item.category || '-'}</td>
                     <td class="p-3.5 font-bold text-slate-900">${isWaste ? (item.amount || 0) + ' kg' : '⭐ ' + (item.rating || 0) + ' 星'}</td>
                     <td class="p-3.5 text-teal-600 font-bold">${isWaste ? (item.carbon || 0) + ' kg' : '-'}</td>
