@@ -101,10 +101,11 @@
                         <p id="user-display-email" class="text-xs font-semibold text-white"></p>
                         <p id="user-display-company" class="text-[10px] text-emerald-400"></p>
                     </div>
-                    <!-- 🔄 手動同步按鈕 -->
-               <button onclick="loadCloudData()" id="sync-btn" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-400 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition">
-    <span id="sync-icon">🔄</span> 同步雲端
-</button>
+                    <!-- 🔄 手動同步按鈕 (含離線佇列狀態提示) -->
+                    <button onclick="loadCloudData()" id="sync-btn" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-white px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition relative">
+                        <span id="sync-icon">🔄</span> 同步雲端
+                        <span id="offline-badge" class="hidden absolute -top-1.5 -right-1.5 bg-amber-500 text-slate-900 text-[9px] font-extrabold px-1.5 py-0.2 rounded-full">離線暫存</span>
+                    </button>
                     <!-- 🌟 整合後的永續行動按鈕 -->
                     <button onclick="openModal('waste')" class="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-1.5">
                         🌱 永續行動
@@ -387,6 +388,25 @@
                 document.getElementById('login-password').value = savedPassword;
                 document.getElementById('remember-me').checked = true;
             }
+
+            // 🌟 【機制一】重新整理不登出：檢查本機是否有登入紀錄
+            const savedUser = localStorage.getItem('esg_current_user');
+            if (savedUser) {
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    enterApp(); // 直接進入主畫面
+                } catch (e) {
+                    localStorage.removeItem('esg_current_user');
+                }
+            }
+
+            // 🌟 【機制二】監聽網路恢復狀態，自動觸發背景補同步
+            window.addEventListener('online', function() {
+                console.log("偵測到網路恢復，嘗試同步離線佇列...");
+                syncOfflineQueue();
+            });
+
+            checkOfflineQueueBadge();
         };
 
         function updateEmailDatalist() {
@@ -451,6 +471,7 @@
                 } else if (res.status === "success") {
                     alert(`🎉 帳號申請成功！\n${companyName}\n帳號：${email}`);
                     currentUser = { email: email, role: 'USER', companyId: companyId, companyName: companyName };
+                    localStorage.setItem('esg_current_user', JSON.stringify(currentUser)); // 儲存登入狀態
                     enterApp();
                 } else {
                     alert("註冊發生錯誤：" + (res.message || "未知原因"));
@@ -512,6 +533,7 @@
 
             if (email === 'admin@esg.com' && password === 'admin123') {
                 currentUser = { email: 'admin@esg.com', role: 'ADMIN', companyId: 'ALL', companyName: '監控中心' };
+                localStorage.setItem('esg_current_user', JSON.stringify(currentUser)); // 儲存登入狀態
                 enterApp();
                 return;
             }
@@ -540,6 +562,7 @@
                         companyId: res.companyId,
                         companyName: res.companyName
                     };
+                    localStorage.setItem('esg_current_user', JSON.stringify(currentUser)); // 儲存登入狀態
                     enterApp();
                 } else {
                     alert('⚠️ 登入失敗：帳號或密碼錯誤。');
@@ -578,6 +601,7 @@
 
         function handleLogout() {
             currentUser = null;
+            localStorage.removeItem('esg_current_user'); // 🧹 清除本機登入狀態
             document.getElementById('app-screen').classList.add('hidden');
             document.getElementById('auth-screen').classList.remove('hidden');
             if (!document.getElementById('remember-me').checked) {
@@ -590,28 +614,31 @@
             const syncIcon = document.getElementById('sync-icon');
             if (syncIcon && !isBackground) syncIcon.classList.add('animate-spin');
 
-            fetch(GOOGLE_SCRIPT_URL)
-                .then(res => res.json())
-                .then(data => {
-                    if (data && Array.isArray(data.records)) database = data.records;
-                    if (data && Array.isArray(data.companies)) registeredCompanies = data.companies;
-                    updateAdminCompanySelect();
-                    filterData();
-                })
-                .catch(err => {
-                    console.error("雲端讀取失敗:", err);
-                    filterData();
-                })
-                .finally(() => {
-                    if (syncIcon) syncIcon.classList.remove('animate-spin');
-                });
+            // 🌟 點擊同步時，順便嘗試把離線佇列上傳
+            syncOfflineQueue().then(() => {
+                fetch(GOOGLE_SCRIPT_URL)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && Array.isArray(data.records)) database = data.records;
+                        if (data && Array.isArray(data.companies)) registeredCompanies = data.companies;
+                        updateAdminCompanySelect();
+                        filterData();
+                    })
+                    .catch(err => {
+                        console.error("雲端讀取失敗 (可能處於離線狀態):", err);
+                        filterData();
+                    })
+                    .finally(() => {
+                        if (syncIcon) syncIcon.classList.remove('animate-spin');
+                    });
+            });
         }
 
         function updateAdminCompanySelect() {
             const select = document.getElementById('admin-company-select');
             if (!select) return;
             const currentVal = select.value || 'ALL';
-            let html = `<option value="ALL">🌐 所有單位彙總 (Total Overview)</option>`;
+            let html = `<option value="ALL">🌐 所有組織彙總 (Total Overview)</option>`;
             registeredCompanies.forEach(comp => {
                 html += `<option value="${comp.companyId}">🏢  ${comp.companyName}</option>`;
             });
@@ -702,6 +729,7 @@
             document.getElementById('modal').classList.add('hidden');
         }
 
+        // 🌟 【機制三】本機離線暫存與自動補傳的核心邏輯
         function handleModalSubmit(e) {
             e.preventDefault();
             const editId = document.getElementById('form-id').value;
@@ -749,15 +777,65 @@
                 }
             })
             .catch(err => {
-                console.error("雲端同步異常:", err);
-                alert('🎉 資料已上傳，正在重新載入最新雲端紀錄！');
+                console.warn("網路異常，啟動離線暫存機制...", err);
+                // 🌟 當網路失敗時，存入本機離線佇列
+                saveToOfflineQueue(payload);
+                alert('📴 目前偵測無網路訊號，資料已安全暫存於本機！\n等恢復網路連線並點擊「同步雲端」或重連時將自動上傳。');
                 closeModal();
-                setTimeout(loadCloudData, 1200);
+                checkOfflineQueueBadge();
             })
             .finally(() => {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = `確認並同步雲端`;
             });
+        }
+
+        function saveToOfflineQueue(payload) {
+            let queue = JSON.parse(localStorage.getItem('esg_offline_queue') || '[]');
+            queue.push(payload);
+            localStorage.setItem('esg_offline_queue', JSON.stringify(queue));
+        }
+
+        function checkOfflineQueueBadge() {
+            const badge = document.getElementById('offline-badge');
+            if (!badge) return;
+            let queue = JSON.parse(localStorage.getItem('esg_offline_queue') || '[]');
+            if (queue.length > 0) {
+                badge.classList.remove('hidden');
+                badge.innerText = `離線暫存 (${queue.length})`;
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        async function syncOfflineQueue() {
+            let queue = JSON.parse(localStorage.getItem('esg_offline_queue') || '[]');
+            if (queue.length === 0) return;
+
+            console.log(`開始同步本機 ${queue.length} 筆離線暫存資料...`);
+            let remainingQueue = [];
+
+            for (let item of queue) {
+                try {
+                    let res = await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify(item)
+                    });
+                    let data = await res.json();
+                    if (data.status !== "success") {
+                        remainingQueue.push(item); // 若失敗保留
+                    }
+                } catch (e) {
+                    remainingQueue.push(item); // 網路依舊不通則保留
+                }
+            }
+
+            localStorage.setItem('esg_offline_queue', JSON.stringify(remainingQueue));
+            checkOfflineQueueBadge();
+            if (queue.length > remainingQueue.length) {
+                console.log("離線暫存資料已成功自動補傳至雲端！");
+            }
         }
 
         function deleteRecord(id) {
