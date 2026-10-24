@@ -101,7 +101,8 @@
                         <p id="user-display-email" class="text-xs font-semibold text-white"></p>
                         <p id="user-display-company" class="text-[10px] text-emerald-400"></p>
                     </div>
-                    <button onclick="loadCloudData()" id="sync-btn" class="hidden bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition">
+                    <!-- 🔄 手動同步按鈕常駐顯示 -->
+                    <button onclick="loadCloudData()" id="sync-btn" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition">
                         <span id="sync-icon">🔄</span> 同步雲端
                     </button>
                     <button onclick="openModal('waste')" class="bg-emerald-600 hover:bg-emerald-800 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-sm transition">
@@ -280,7 +281,7 @@
                <!-- 🌟 廢棄物/資材種類下拉選單 (合規標準清單) -->
                <div id="field-category-waste">
                    <label class="block font-semibold text-slate-600 uppercase mb-1">廢棄物/資材種類 (GRI 306 合規清單)</label>
-                   <select id="form-category-waste" required class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-medium text-slate-700">
+                   <select id="form-category-waste" class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none bg-white font-medium text-slate-700">
                        <option value="" disabled selected>-- 請選擇合規減碳資材種類 --</option>
                        <option value="咖啡渣">☕ 咖啡渣 (GRI 306-2 循環再利用)</option>
                        <option value="茶葉渣">🍵 茶葉渣 (GRI 306-2 循環再利用)</option>
@@ -356,13 +357,12 @@
 
     <!-- Application JavaScript Logic -->
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw7LTGX-_z62FZXuIAD1wlIIl03suJA_VWGy_k789PVGqdLRq6tm2lAQF0F6ehdEIk0ZA/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9GcCDAb5lB_dEoC5k5o586nZvQZkqkpzE1BDqZvs7Ngn5y1u2UbdnA4EorHkGpAzujw/exec";
 
         let database = [];
         let registeredCompanies = [];
         let currentUser = null;
         let compressedPhotoBase64 = '';
-        let syncTimer = null;
         let cWasteTrend = null, cWasteCat = null, cBioTrend = null, cBioCat = null;
 
         window.onload = function() {
@@ -377,14 +377,6 @@
                 document.getElementById('remember-me').checked = true;
             }
         };
-
-        function startAutoSync() {
-            if (syncTimer) clearInterval(syncTimer);
-            // 🔄 每 15 秒自動輪詢雲端，實現跨裝置同步
-            syncTimer = setInterval(function() {
-                if (currentUser) loadCloudData(true);
-            }, 15000);
-        }
 
         function updateEmailDatalist() {
             const datalist = document.getElementById('saved-emails');
@@ -571,11 +563,9 @@
             }
 
             loadCloudData();
-            startAutoSync();
         }
 
         function handleLogout() {
-            if (syncTimer) clearInterval(syncTimer);
             currentUser = null;
             document.getElementById('app-screen').classList.add('hidden');
             document.getElementById('auth-screen').classList.remove('hidden');
@@ -627,6 +617,8 @@
             compressedPhotoBase64 = '';
 
             const photoInput = document.getElementById('form-photo');
+            const wasteCategorySelect = document.getElementById('form-category-waste');
+            const wasteAmountInput = document.getElementById('form-amount');
 
             if (editId) {
                 const item = database.find(i => String(i.id) === String(editId));
@@ -646,12 +638,16 @@
                     document.getElementById('field-category-waste').classList.remove('hidden');
                     document.getElementById('field-amount-waste').classList.remove('hidden');
                     document.getElementById('field-bio-details').classList.add('hidden');
-                    document.getElementById('form-category-waste').value = item.category;
-                    document.getElementById('form-amount').value = item.amount;
+                    wasteCategorySelect.required = true;
+                    wasteAmountInput.required = true;
+                    wasteCategorySelect.value = item.category;
+                    wasteAmountInput.value = item.amount;
                 } else {
                     document.getElementById('field-category-waste').classList.add('hidden');
                     document.getElementById('field-amount-waste').classList.add('hidden');
                     document.getElementById('field-bio-details').classList.remove('hidden');
+                    wasteCategorySelect.required = false;
+                    wasteAmountInput.required = false;
                     document.getElementById('form-bio-title').value = item.category;
                     document.getElementById('form-worm-rating').value = item.rating;
                 }
@@ -664,10 +660,14 @@
                     document.getElementById('field-category-waste').classList.remove('hidden');
                     document.getElementById('field-amount-waste').classList.remove('hidden');
                     document.getElementById('field-bio-details').classList.add('hidden');
+                    wasteCategorySelect.required = true;
+                    wasteAmountInput.required = true;
                 } else {
                     document.getElementById('field-category-waste').classList.add('hidden');
                     document.getElementById('field-amount-waste').classList.add('hidden');
                     document.getElementById('field-bio-details').classList.remove('hidden');
+                    wasteCategorySelect.required = false;
+                    wasteAmountInput.required = false;
                 }
             }
             document.getElementById('modal').classList.remove('hidden');
@@ -718,7 +718,7 @@
                 if (res.status === "success") {
                     alert(editId ? '🎉 編輯資料已成功更新至雲端！' : '🎉 資料已成功同步至 Google 雲端！');
                     closeModal();
-                    loadCloudData();
+                    loadCloudData(); // 🌟 異動成功後自動重新載入雲端資料
                 } else {
                     alert('⚠️ 雲端寫入失敗：' + (res.message || '未知原因'));
                 }
@@ -727,7 +727,7 @@
                 console.error("雲端同步異常:", err);
                 alert('🎉 資料已上傳，正在重新載入最新雲端紀錄！');
                 closeModal();
-                setTimeout(loadCloudData, 1200);
+                setTimeout(loadCloudData, 1200); // 🌟 容錯重新載入
             })
             .finally(() => {
                 submitBtn.disabled = false;
@@ -748,12 +748,12 @@
             .then(res => res.json())
             .then(res => {
                 alert("🗑️ 資料已成功刪除！");
-                loadCloudData();
+                loadCloudData(); // 🌟 刪除成功後自動重新載入雲端資料
             })
             .catch(err => {
                 console.error("刪除失敗:", err);
                 alert("🗑️ 資料已刪除，正在更新記錄！");
-                setTimeout(loadCloudData, 1200);
+                setTimeout(loadCloudData, 1200); // 🌟 容錯重新載入
             });
         }
 
